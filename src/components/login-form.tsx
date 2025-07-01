@@ -1,3 +1,7 @@
+"use client"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Eye, EyeOff } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,11 +13,52 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
+import { supabase } from "@/lib/supabaseClient"
+
 
 export function LoginForm({
   className,
+  
   ...props
 }: React.ComponentProps<"div">) {
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  async function handleEmailLogin(e: React.FormEvent){
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget as HTMLFormElement)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+
+    if (!email || !password) {
+      toast.error("Missing email or password")
+      return
+    }
+
+    setLoading(true)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    setLoading(false)
+
+    if (error) {
+      toast.error("Login failed", { description: error.message })
+    } else {
+      toast.success("Login successful")
+      router.push("/dashboard")
+    }
+  }
+
+  async function handleGoogleLogin() {
+    const { error } = await supabase.auth.signInWithOAuth({ provider: "google" })
+
+    if (error) {
+      toast.error("Google login failed", { description: error.message })
+    } else {
+      toast.success("Redirecting to Google...")
+      
+    }
+  }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="bg-zinc-900 border-zinc-800 rounded-1">
@@ -24,32 +69,53 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleEmailLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label className="text-zinc-300" htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   required
+                  className="text-zinc-300"
                 />
               </div>
-              <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label className="text-zinc-300" htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-zinc-300"
-                  >
-                    Forgot your password?
-                  </a>
+              
+                <div className="grid gap-3">
+                  <div className="flex items-center">
+                    <Label className="text-zinc-300" htmlFor="password">Password</Label>
+                    <a
+                      href="/forgot-password"
+                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-zinc-300"
+                    >
+                      Forgot your password?
+                    </a>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      className="pr-10 text-zinc-300"
+                      
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-2 top-2.5 text-zinc-400 hover:text-white"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      <span className="sr-only">Toggle password visibility</span>
+                    </button>
+                  </div>
                 </div>
-                <Input id="password" type="password" required />
-              </div>
+              
               <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full bg-teal-500 text-zinc-950 font- hover:bg-teal-400">
-                  Login
+                <Button type="submit" disabled={loading} className="w-full bg-teal-500 text-zinc-950 font- hover:bg-teal-400">
+                   {loading ? "Logging in..." : "Login"}
                 </Button>
                 {/* Divider */}
                 <div className="relative my-2">
@@ -61,7 +127,7 @@ export function LoginForm({
                   </div>
                 </div>
                 
-                <Button variant="default" className="w-full bg-zinc-700 border-zinc-900 border hover:bg-zinc-500" >
+                <Button type="button" onClick={handleGoogleLogin} variant="default" className="w-full bg-zinc-700 border-zinc-900 border hover:bg-zinc-500" >
                   <svg
                     className="mr-2 h-4 w-4"
                     xmlns="http://www.w3.org/2000/svg"
