@@ -24,7 +24,7 @@ export default function Navbar() {
       {/* Right : Desktop nav */}
       <div className="hidden md:flex items-center gap-4">
         <Link
-          href="https://github.com/YOUR_REPO"
+          href="https://github.com/satvik-Hecker/curlyBrackets"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -64,7 +64,7 @@ export default function Navbar() {
 
       <div className="flex flex-col gap-4 text-sm font-mono">
         <a
-          href="https://github.com/YOUR_REPO"
+          href="https://github.com/satvik-Hecker/curlyBrackets"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2"
