@@ -103,9 +103,9 @@ export default function HeroSection() {
                       <Button
                         asChild
                         size="lg"
-                        className="rounded-xl px-5 text-sm bg-white text-zinc-950 font-bold hover:bg-white hover:text-zinc-950"
+                        className="rounded-xl px-5 mb-6 text-sm bg-white text-zinc-950 font-bold hover:bg-white hover:text-zinc-950"
                       >
-                        <Link href="#link">
+                        <Link href="/courses">
                           <span className="text-nowrap">Start learning today!</span>
                         </Link>
                       </Button>
@@ -114,7 +114,7 @@ export default function HeroSection() {
                   </AnimatedGroup>
                 </div>
               </div>
-            <div className="aspect-[15/8] w-full rounded-2xl bg-transparent" />
+            <div className=" w-full rounded-2xl bg-transparent" />
             </div>
           </section>
         </main>

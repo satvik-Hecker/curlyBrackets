@@ -12,17 +12,21 @@ import { Menu, Github, X } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { li } from "framer-motion/client"
+import { useRouter } from "next/navigation"
+import { userAgent } from "next/server"
 
 const menuItems = [
   {name:"Home", href:"/"},
-  {name:"Features", href:"/features"},
-  {name:"FAQ", href:'/faq'},
-  {name:"Contact", href:'/contact'},
+  {name:"Features", href:"#features"},
+  {name:"FAQ", href:'#faq'},
+  {name:"Contact", href:'#contact'},
 ]
+
 
 export default function Navbar() {
    const [menuState, setMenuState] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
+    const router=useRouter();
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -43,6 +47,8 @@ export default function Navbar() {
                     block: 'start'
                 })
             }
+        }else{
+          router.push(href)
         }
     }
 

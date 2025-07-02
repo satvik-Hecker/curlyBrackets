@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Castoro } from "next/font/google";
 import HeroSection from "@/components/landing/HeroSection";
+import FeaturesSection from "@/components/landing/Features";
+import { Faq } from "@/components/landing/Faq";
 
 const castoro = Castoro({
   weight: '400', 
@@ -20,6 +22,8 @@ export default function Home() {
           }}
         />
         <HeroSection></HeroSection>
+        <FeaturesSection></FeaturesSection>
+        <Faq/>
         </div>
   );
 }
