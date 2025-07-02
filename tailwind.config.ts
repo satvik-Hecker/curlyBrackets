@@ -13,6 +13,9 @@ const config: Config = {
         castoro: ["var(--font-castoro)"],
       },
     },
+    colors:{
+      background:"hsl(var(--background))",
+    }
   },
   plugins: [],
 };

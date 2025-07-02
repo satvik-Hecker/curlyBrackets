@@ -8,6 +8,8 @@ import { Toaster } from "sonner"
 import { useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
+import Footer from "@/components/shared/footer";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,6 +54,8 @@ export default function RootLayout({
         <Navbar></Navbar>
         {children}
         <Toaster position="top-right" richColors></Toaster>
+        
+        <Footer></Footer>
       </body>
     </html>
   );
