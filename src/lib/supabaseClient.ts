@@ -1,6 +1,21 @@
 import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
-const supabaseUrl = 'https://buwgpubilefposmqprgr.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1d2dwdWJpbGVmcG9zbXFwcmdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzMzM4MDEsImV4cCI6MjA2NjkwOTgwMX0.ltoC7TwmUDbEr_10NhushdoMhNkEA4jxVpVUY1gHRI0'
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+
+    global: {
+    headers: {
+      'Accept': 'application/json',
+    },
+  },
+  
+    auth:{
+        autoRefreshToken: true,
+        persistSession:true,
+        detectSessionInUrl:true
+    }
+})

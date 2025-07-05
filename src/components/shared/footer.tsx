@@ -40,7 +40,7 @@ const Footer=()=>{
                     </div>
 
                     {/* Connect */}
-                    <div>
+                    <div id="contact">
                         <h3 className="text-lg font-semibold mb-4">Connect</h3>
                         <div className="flex space-x-4">
                         <Link

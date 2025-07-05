@@ -1,6 +1,7 @@
 "use client"
+
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+
 import { Eye, EyeOff } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -15,75 +16,81 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { supabase } from "@/lib/supabaseClient"
+import Link from "next/link"
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-    const [showPassword, setShowPassword] = useState(false)
-    const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string; general?: string }>({})
-    const [loading, setLoading] = useState(false)
-    const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
+  const [errors, setErrors] = useState<{ email?: string; password?: string; name?: string }>({})
+  const [loading, setLoading] = useState(false)
 
-    async function handleGoogleSignup(){
-      const { error }= await supabase.auth.signInWithOAuth({
-        provider:"google",
-      })
 
-      if(error){
-        toast.error("Google signup failed", { description: error.message})
-      }else{
-        toast.success("Redirecting to Google...")
+  async function handleGoogleSignup() {
+    console.log("🔄 SignupForm: Google signup initiated")
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
       }
+    })
+
+    console.log("🔄 SignupForm: Google OAuth response:", { data, error })
+
+    if (error) {
+      console.error("🔄 SignupForm: Google signup error:", error)
+      toast.error("Google signup failed", { description: error.message })
+    } else {
+      console.log("🔄 SignupForm: Google signup successful, redirecting...")
+      toast.success("Redirecting to Google...")
     }
-      
-    
+  }
 
-    async function handleSubmit(e: React.FormEvent){
-      e.preventDefault();
-      setErrors({});
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setErrors({})
 
-      const formData = new FormData(e.currentTarget as HTMLFormElement);
-      const email = formData.get("email") as string
-      const password = formData.get("password") as string
-      const name = formData.get("name") as string
+    const formData = new FormData(e.currentTarget as HTMLFormElement)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+    const name = formData.get("name") as string
 
-      const newErrors: typeof errors = {}
-      if(!name.trim()) newErrors.name = "Name is required"
-      if(!email.includes("@")) newErrors.email = "Enter a valid mail"
-      if(password.length < 8 ) newErrors.password = "Paswword must be at least 8 characters long"
+    const newErrors: typeof errors = {}
+    if (!name.trim()) newErrors.name = "Name is required"
+    if (!email.includes("@")) newErrors.email = "Enter a valid email"
+    if (password.length < 8) newErrors.password = "Password must be at least 8 characters"
 
-      if(Object.keys(newErrors).length > 0){
-        setErrors(newErrors)
-        return
-      }
-      setLoading(true);
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
 
-      const {data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options:{
-          data:{name},
-        },
-      }) 
+    setLoading(true)
 
-      if (error){
-        toast.error("Signup failed", {
-        description: error.message,
-})
-      }else if(!data.user){
-        setErrors({email:"An account with this email already exists"})
-      }
-      else{
-         toast.success("Signup successful", {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    setLoading(false)
+
+    if (error) {
+      toast.error("Signup failed", { description: error.message })
+    } else {
+      toast.success("Signup successful!", {
         description: "Check your email to confirm your account.",
-        })
-        router.push("/login");
-      }    
+      })
+      
     }
-    
+  }
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6 mt-12 md:mt-20", className)} {...props}>
       <Card className="bg-zinc-900 border-zinc-800 rounded-1">
         <CardHeader>
           <CardTitle className="text-white text-2xl font-semibold">Join the platform</CardTitle>
@@ -124,37 +131,33 @@ export function SignupForm({
 
               {/* Password */}
               <div className="grid gap-3">
-                  <div className="flex items-center">
-                    <Label className="text-zinc-300" htmlFor="password">Password</Label>
-                    
-                  </div>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      required
-                      className="pr-10 text-zinc-300"
-                      
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-2 top-2.5 text-zinc-400 hover:text-white"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      <span className="sr-only">Toggle password visibility</span>
-                    </button>
-                  </div>
-                  {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+                <div className="flex items-center justify-between">
+                  <Label className="text-zinc-300" htmlFor="password">Password</Label>
                 </div>
-                {/* General error */}
-                {errors.general && <p className="text-sm text-red-500">{errors.general}</p>}
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    className="pr-10 text-zinc-300"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-2 top-2.5 text-zinc-400 hover:text-white"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <span className="sr-only">Toggle password visibility</span>
+                  </button>
+                </div>
+                {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+              </div>
 
               {/* Submit */}
               <div className="flex flex-col gap-3">
                 <Button type="submit" disabled={loading} className="w-full bg-teal-500 text-zinc-950 hover:bg-teal-400">
-                  {loading ? "Signing up.." : "Sign Up"}
+                  {loading ? "Signing up..." : "Sign Up"}
                 </Button>
 
                 {/* Divider */}
@@ -199,9 +202,9 @@ export function SignupForm({
             {/* Footer CTA */}
             <div className="mt-4 text-center text-sm text-zinc-300">
               Already have an account?{" "}
-              <a href="/login" className="underline underline-offset-4 text-zinc-300">
+              <Link href="/auth/login" className="underline underline-offset-4 text-zinc-300">
                 Login
-              </a>
+              </Link>
             </div>
           </form>
         </CardContent>

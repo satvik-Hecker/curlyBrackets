@@ -45,23 +45,35 @@ export function LoginForm({
       toast.error("Login failed", { description: error.message })
     } else {
       toast.success("Login successful")
-      router.push("/dashboard")
+      setTimeout(() => router.replace("/dashboard"), 1200)
+
     }
   }
 
   async function handleGoogleLogin() {
-    const { error } = await supabase.auth.signInWithOAuth({ provider: "google" })
+    console.log("🔄 LoginForm: Google login initiated")
+    const { data, error } = await supabase.auth.signInWithOAuth({ 
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    })
+
+    console.log("🔄 LoginForm: Google OAuth response:", { data, error })
 
     if (error) {
+      console.error("🔄 LoginForm: Google login error:", error)
       toast.error("Google login failed", { description: error.message })
     } else {
+      console.log("🔄 LoginForm: Google login successful, redirecting...")
       toast.success("Redirecting to Google...")
-      
     }
   }
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="bg-zinc-900 border-zinc-800 rounded-1">
+    <div 
+      
+    className={cn("flex flex-col gap-6  mt-12 md:mt-20", className)} {...props}>
+      <Card className="bg-zinc-900 border-zinc-800 rounded-1 ">
         <CardHeader>
           <CardTitle className="text-white text-2xl font-semibold">Welcome back</CardTitle>
           <CardDescription className="text-zinc-400">
@@ -87,7 +99,7 @@ export function LoginForm({
                   <div className="flex items-center">
                     <Label className="text-zinc-300" htmlFor="password">Password</Label>
                     <a
-                      href="/forgot-password"
+                      href="/auth/forgot-password"
                       className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-zinc-300"
                     >
                       Forgot your password?
@@ -160,7 +172,7 @@ export function LoginForm({
             
             <div className="mt-4 text-center text-sm text-zinc-300">
               Don&apos;t have an account?{" "}
-              <a href="/signup" className="underline text-zinc-300 underline-offset-4">
+              <a href="/auth/signup" className="underline text-zinc-300 underline-offset-4">
                 Sign up
               </a>
             </div>

@@ -1,17 +1,9 @@
 "use client"
 import React from "react"
 import { Button } from "../ui/button"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTrigger,
-  SheetTitle,
-} from "@/components/ui/sheet"
 import { Menu, Github, X } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { li } from "framer-motion/client"
 import { useRouter } from "next/navigation"
 import { userAgent } from "next/server"
 
@@ -120,7 +112,7 @@ export default function Navbar() {
                                     size="sm"
                                     className={cn("bg-transparent text-white border hover:bg-transparent hover:text-white",
                                     isScrolled ? 'lg:hidden' : "")}>
-                                    <Link href="/login">
+                                    <Link href="/auth/login">
                                         <span>Login</span>
                                     </Link>
                                 </Button>
@@ -129,7 +121,7 @@ export default function Navbar() {
                                     size="sm"
                                     className={cn("bg-teal-400 text-teal-950  hover:bg-teal-300",
                                     isScrolled ? 'lg:hidden' : "")}>
-                                    <Link href="/signup">
+                                    <Link href="/auth/signup">
                                         <span>Sign Up</span>
                                     </Link>
                                 </Button>
@@ -137,7 +129,7 @@ export default function Navbar() {
                                     asChild
                                     size="sm"
                                     className={cn("bg-white text-teal-950 font-bold hover:bg-zinc-300 hover:text-teal-950 drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]",isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                                    <Link href="/signup">
+                                    <Link href="/auth/signup">
                                         <span>Get Started</span>
                                     </Link>
                                 </Button>

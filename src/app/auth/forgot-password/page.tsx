@@ -14,21 +14,21 @@ export default function ForgotPasswordPage() {
   const handleReset = async () => {
     setLoading(true)
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:3000/reset-password", // update to your domain when deployed
+      redirectTo: "http://localhost:3000/auth/reset-password", // update to your domain when deployed
     })
     setLoading(false)
 
     if (error) {
       toast.error("Reset failed", { description: error.message })
     } else {
-      toast.success("Password reset email sent!", {
-        description: "Check your inbox.",
-      })
+      toast.success("Check your inbox", {
+       description: "We’ve sent you a link to reset your password.",
+    })
     }
   }
 
   return (
-    <div className="min-h-svh w-full items-center justify-center p-6 md:p-10 bg-black font-mono">
+    <div className="w-full items-center justify-center p-6 md:p-10 bg-black font-mono">
         <motion.div
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}

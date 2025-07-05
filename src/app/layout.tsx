@@ -1,20 +1,21 @@
 "use client"
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Session } from '@supabase/supabase-js'
+import {  Geist_Mono } from "next/font/google";
 import { Castoro } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/navbar";
 import { Toaster } from "sonner"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import Footer from "@/components/shared/footer";
+import PostLoginNavbar from "@/components/shared/postlogin-nav";
+import type { User } from '@supabase/supabase-js'
 
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+
+
+
 
 const castoro = Castoro({
   weight: '400', 
@@ -34,24 +35,41 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname();
 
-  useEffect(()=>{
-    const redirectIfLogin = async() =>{
-      const { data : {user}} =await supabase.auth.getUser();
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser()
+        if (error) {
+          console.error("Error getting user:", error)
+        }
+        setUser(user)
+      } catch (error) {
+        console.error("Unexpected error getting user:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    getUser()
 
-      // if(user && (pathname==="/" || pathname==="/signup" || pathname==="/login")){
-      //   router.push("/dashboard")
-      // }
-    };
-    redirectIfLogin();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
 
-  },[router,pathname])
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${castoro.variable}`}>
+    <html lang="en" className={`${geistMono.variable} ${castoro.variable}`}>
       <body>
-        <Navbar></Navbar>
+      
+        {!loading && (user ? <PostLoginNavbar/> : <Navbar/>)}
+        
         {children}
         <Toaster position="top-right" richColors></Toaster>
         
