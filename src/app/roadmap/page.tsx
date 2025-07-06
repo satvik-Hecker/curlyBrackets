@@ -1,107 +1,12 @@
 'use client'
 
-
+import { topics } from "@/data/topics"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ChevronLeft, ChevronRight, Clock, BookOpen } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
-
-
-
-const topics = [
-  {
-    title: "HTML & CSS Fundamentals",
-    srn: 1,
-    desc: "Learn the basics of HTML and CSS",
-    tags: ["HTML", "CSS", "Frontend"],
-    duration: "2h 15m",
-    difficulty: "Beginner",
-    image: "/html-css.jpg",
-    slug: "html-css-fundamentals",
-  },
-  {
-    title: "JavaScript Essentials",
-    srn: 2,
-    desc: "Master the core concepts of JavaScript programming",
-    tags: ["JavaScript", "Frontend"],
-    duration: "3h 45m",
-    difficulty: "Beginner",
-    image: "/javascript.jpg",
-    slug: "javascript-essentials",
-  },
-  {
-    title: "Advanced CSS",
-    srn: 3,
-    desc: "Create websites that look great on any device",
-    tags: ["CSS", "Frontend", "Responsive"],
-    duration: "2h 30m",
-    difficulty: "Intermediate",
-    image: "/css-advanced.webp",
-    slug: "advanced-css",
-  },
-  {
-    title: "Git & GitHub Workflow",
-    srn: 4,
-    desc: "Master version control for your projects",
-    tags: ["Git", "Github", "Tools"],
-    duration: "1h 45m",
-    difficulty: "Beginner",
-    image: "/git-pic.webp",
-    slug: "git-github-workflow",
-  },
-  {
-    title: "Node.js Basics",
-    srn: 5,
-    desc: "Server-side Javascript with Node.js",
-    tags: ["Node.js", "JavaScript", "Backend"],
-    duration: "3h 10m",
-    difficulty: "Intermediate",
-    image: "/nodejs.webp",
-    slug: "nodejs-basics",
-  },
-  {
-    title: "Advanced Backend and Express",
-    srn: 6,
-    desc: "Build advanced Express.js backends with middleware, authentication, databases, and APIs.",
-    tags: ["Node.js", "JavaScript", "Backend"],
-    duration: "4h 25m",
-    difficulty: "Advanced",
-    image: "/advBack.webp",
-    slug: "advanced-backend-express",
-  },
-  {
-    title: "Database",
-    srn: 7,
-    desc: "Store, organize, and manage data efficiently using Databases",
-    tags: ["Node.js", "JavaScript", "Backend", "Database"],
-    duration: "2h 15m",
-    difficulty: "Intermediate",
-    image: "/database.webp",
-    slug: "database",
-  },
-  {
-    title: "React Basics",
-    srn: 8,
-    desc: "Learn components, props, state, and hooks to build interactive UIs.",
-    tags: ["React", "JavaScript", "Frontend"],
-    duration: "2h 40m",
-    difficulty: "Intermediate",
-    image: "/react.jpg",
-    slug: "react-basics",
-  },
-  {
-    title: "Mastering React",
-    srn: 9,
-    desc: "Master performance optimization, state management, server-side rendering, and advanced hooks.",
-    tags: ["React", "JavaScript", "Frontend"],
-    duration: "3h 10m",
-    difficulty: "Advanced",
-    image: "/advReact.jpg",
-    slug: "mastering-react",
-  },
-]
 
 const getDifficultyColor = (difficulty : string) => {
   switch (difficulty){
@@ -118,7 +23,21 @@ const getDifficultyColor = (difficulty : string) => {
 
 export default function RoadmapPage() {
   const [currIndex, setCurrentIndex] = useState(0);
-  const cardsPerView = 3;
+  const [cardsPerView, setCardsPerView] = useState(3);
+
+useEffect(()=>{
+  const updateCardsPerView = ()=>{
+    const width=window.innerWidth;
+    if(width < 768) setCardsPerView(1);
+    else if (width < 1024) setCardsPerView(2);
+    else setCardsPerView(3);
+  };
+  updateCardsPerView();
+  window.addEventListener("resize",updateCardsPerView);
+  return ()=> window.removeEventListener("resize",updateCardsPerView);
+},[])
+
+
   const maxIndex = Math.max(0,topics.length - cardsPerView)
 
   const nextSlide = () => {
