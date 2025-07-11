@@ -106,7 +106,7 @@ useEffect(()=>{
             <AnimatePresence mode="wait">
               {visibleTopics.map((topic, index) => (
                 <motion.div
-                  key={`${topic.slug}-${currIndex}`}
+                  key={`${topic.srn}-${currIndex}`}
                   initial={{ opacity: 0, x: 100 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -100 }}
@@ -115,7 +115,7 @@ useEffect(()=>{
                   // transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   className="group h-full"
                 >
-                  <Link href={`/learn/${topic.slug}`}>
+                  <Link href={`/learn/${topic.srn}`}>
                     <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-500 overflow-hidden cursor-pointer h-full flex flex-col ">
                       <CardContent className="p-6 flex flex-col h-full">
                         <div className="space-y-4 flex-1 flex flex-col">
