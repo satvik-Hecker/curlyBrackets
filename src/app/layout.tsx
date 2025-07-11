@@ -66,7 +66,7 @@ export default function RootLayout({
   }, [])
   return (
     <html lang="en" className={`${geistMono.variable} ${castoro.variable}`}>
-      <body>
+      <body className='bg-black'>
       
         {!loading && (user ? <PostLoginNavbar/> : <Navbar/>)}
         
