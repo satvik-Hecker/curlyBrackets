@@ -5,8 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { BorderBeam } from '@/components/magicui/border-beam';
+import { ArrowLeft, ArrowRight, Clock, Star } from 'lucide-react';
+import { PlayCircle, BookOpen } from 'lucide-react';
+
 interface Topic {
   srn: number;
   title: string;
@@ -75,20 +76,19 @@ export default function LearnTopicPage({ params }: { params: { srn: string } }) 
 
           {/* Topic Details */}
           <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
-            <h1 className="text-3xl font-bold mb-2 text-teal-400">{topic.title}</h1>
-            <p className="text-lg text-teal-200 mb-4">{topic.desc}</p>
+            <h1 className="text-3xl font-bold mb-2 text-teal-200 [text-shadow:0_0_5px_black] ">{topic.title}</h1>
+            <p className="text-sm text-white mb-1">{topic.desc}</p>
             <div className="flex flex-wrap gap-4 mb-2">
-              <span className="flex items-center gap-1 px-3 py-1 bg-teal-900 text-teal-300 rounded text-sm">
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M12 6v6l4 2"/></svg>
+              <span className="flex items-center gap-1 bg-transparent text-teal-100 text-[13px]">
+                <Clock className='w-4 h-4'></Clock>
                 {topic.duration}
               </span>
-              <span className="flex items-center gap-1 px-3 py-1 bg-teal-900 text-teal-300 rounded text-sm">
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><text x="12" y="16" textAnchor="middle" fontSize="10" fill="currentColor">{topic.difficulty[0]}</text></svg>
+              <span className="flex items-center gap-1 bg-transparent text-teal-100 text-[13px]">
+                <Star className='w-4 h-4 '></Star>
                 {topic.difficulty}
               </span>
-              {topic.tags.map(tag => (
-                <span key={tag} className="px-2 py-1 bg-zinc-800 text-teal-500 rounded text-xs">{tag}</span>
-              ))}
+
+             
             </div>
           </div>
         </div>
@@ -110,17 +110,25 @@ export default function LearnTopicPage({ params }: { params: { srn: string } }) 
             </div>
 
           <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
-            <h2 className="text-xl font-semibold mb-3 text-teal-300">Course Content</h2>
+            <h2 className="text-2xl font-semibold mb-3 text-teal-300">Course Content</h2>
             <ul className="space-y-3">
               {topicSubtopics.map((sub: Subtopic) => (
-                <li key={sub.id} className="flex items-center justify-between bg-zinc-800 border border-teal-800 rounded shadow p-3">
+                <li key={sub.id} className="flex items-center justify-between bg-zinc-800 border border-teal-800 rounded-lg shadow p-3">
                   <div>
-                    <div className="font-medium text-white">{sub.title}</div>
+                    <div className="text-[15px] font-semibold text-white mb-1">{sub.title}</div>
                     <div className="text-xs text-teal-400">{sub.duration}</div>
                   </div>
                   <Link href={sub.url} target="_blank">
-                    <Button size="sm" variant="secondary" className="bg-teal-700 text-white hover:bg-teal-600">
-                      {sub.type === 'video' ? 'Play' : 'Read'}
+                    <Button size="icon"  variant="ghost" className="bg-transparent text-white size-8 border-none rounded-full hover:bg-teal-200 hover:text-teal-950">
+                    {sub.type === 'video' ? (
+                         <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                         <g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor">
+                           <path d="M6 3L20 12 6 21 6 3z"></path>
+                         </g>
+                       </svg>
+                        ) : (
+                        <BookOpen size={16} />
+                        )}
                     </Button>
                   </Link>
                 </li>

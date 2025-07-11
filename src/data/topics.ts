@@ -1,15 +1,24 @@
 export const topics = [
   {
     srn: 1,
-    title: "HTML & CSS Fundamentals",
-    desc: "Learn the basics of HTML and CSS",
-    tags: ["HTML", "CSS", "Frontend"],
+    title: "HTML Fundamentals",
+    desc: "Learn the basics of HTML and web development",
+    tags: ["HTML", "Frontend"],
     duration: "2h 15m",
     difficulty: "Beginner",
     image: "/html-css.jpg",
   },
   {
     srn: 2,
+    title: "CSS Basics",
+    desc: "Understand the core concepts of styling using CSS",
+    tags: ["CSS", "Frontend"],
+    duration: "1h 10m",
+    difficulty: "Beginner",
+    image: "/html-css.jpg",
+  },
+  {
+    srn: 3,
     title: "JavaScript Essentials",
     desc: "Master the core concepts of JavaScript programming",
     tags: ["JavaScript", "Frontend"],
@@ -18,7 +27,7 @@ export const topics = [
     image: "/javascript.jpg",
   },
   {
-    srn: 3,
+    srn: 4,
     title: "Advanced CSS",
     desc: "Create websites that look great on any device",
     tags: ["CSS", "Frontend", "Responsive"],
@@ -27,7 +36,7 @@ export const topics = [
     image: "/css-advanced.webp",
   },
   {
-    srn: 4,
+    srn: 5,
     title: "Git & GitHub Workflow",
     desc: "Master version control for your projects",
     tags: ["Git", "Github", "Tools"],
@@ -36,7 +45,7 @@ export const topics = [
     image: "/git-pic.webp",
   },
   {
-    srn: 5,
+    srn: 6,
     title: "Node.js Basics",
     desc: "Server-side Javascript with Node.js",
     tags: ["Node.js", "JavaScript", "Backend"],
@@ -45,7 +54,7 @@ export const topics = [
     image: "/nodejs.webp",
   },
   {
-    srn: 6,
+    srn: 7,
     title: "Advanced Backend and Express",
     desc: "Build advanced Express.js backends with middleware, authentication, databases, and APIs.",
     tags: ["Node.js", "JavaScript", "Backend"],
@@ -54,7 +63,7 @@ export const topics = [
     image: "/advBack.webp",
   },
   {
-    srn: 7,
+    srn: 8,
     title: "Database",
     desc: "Store, organize, and manage data efficiently using Databases",
     tags: ["Node.js", "JavaScript", "Backend", "Database"],
@@ -63,7 +72,7 @@ export const topics = [
     image: "/database.webp",
   },
   {
-    srn: 8,
+    srn: 9,
     title: "React Basics",
     desc: "Learn components, props, state, and hooks to build interactive UIs.",
     tags: ["React", "JavaScript", "Frontend"],
@@ -72,7 +81,7 @@ export const topics = [
     image: "/react.jpg",
   },
   {
-    srn: 9,
+    srn: 10,
     title: "Mastering React",
     desc: "Master performance optimization, state management, server-side rendering, and advanced hooks.",
     tags: ["React", "JavaScript", "Frontend"],
