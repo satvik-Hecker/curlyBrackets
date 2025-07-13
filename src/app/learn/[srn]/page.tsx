@@ -142,7 +142,7 @@ export default function LearnTopicPage({ params }: { params: Promise<{ srn: stri
           variants={containerVariants}
           className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col gap-10 lg:flex-row mt-20"
         >
-          {/* Left Section */}
+        
           <div className="flex-1 flex flex-col gap-1">
             <div className="flex justify-between">
               {prevTopic ? (
@@ -151,7 +151,7 @@ export default function LearnTopicPage({ params }: { params: Promise<{ srn: stri
                     <ArrowLeft className="text-white mr-1" /> Prev Topic
                   </Button>
                 </Link>
-              ) : <div />}
+              ) : <div className='h-8'/>}
             </div>
 
             <motion.div variants={fadeUp}>
@@ -179,7 +179,7 @@ export default function LearnTopicPage({ params }: { params: Promise<{ srn: stri
             </motion.div>
           </div>
 
-          {/* Right Section */}
+          
           <div className="flex-1 min-w-[300px] flex flex-col gap-6">
             <div className="flex justify-end">
               {nextTopic ? (
@@ -188,7 +188,7 @@ export default function LearnTopicPage({ params }: { params: Promise<{ srn: stri
                     Next Topic <ArrowRight className="text-white ml-1" />
                   </Button>
                 </Link>
-              ) : <div />}
+              ) : <div className='h-8'/>}
             </div>
 
             <motion.div variants={fadeUp} className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
