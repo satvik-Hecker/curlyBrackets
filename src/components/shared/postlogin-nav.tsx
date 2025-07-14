@@ -113,7 +113,7 @@ export default function PostLoginNavbar() {
                     asChild
                     className="hover:!bg-zinc-800 hover:!text-white px-3 py-2 rounded-md cursor-pointer"
                   >
-                    <Link href="#">My Profile</Link>
+                    <Link href="/profile">My Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-zinc-700" />
                   <DropdownMenuItem
@@ -174,7 +174,7 @@ export default function PostLoginNavbar() {
                     asChild
                     className="hover:!bg-zinc-800 hover:!text-white px-3 py-2 rounded-md cursor-pointer"
                   >
-                    <Link href="#">My Profile</Link>
+                    <Link href="/profile">My Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-zinc-700" />
                   <DropdownMenuItem
