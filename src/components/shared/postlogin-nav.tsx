@@ -19,7 +19,7 @@ import { supabase } from "@/lib/supabaseClient"
 const menuItems = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Roadmap", href: "/roadmap" },
-  { name: "Badges", href: "/badges" },
+  { name: "Projects", href: "/projects" },
 ]
 
 export default function PostLoginNavbar() {
