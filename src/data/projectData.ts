@@ -62,52 +62,52 @@ export const projects: Project[] = [
     },
     {
         id: "6",
-        name: "DevOps & Deployment",
-        duration: "4 weeks",
-        image: "/placeholder.svg?height=200&width=300&text=DevOps",
+        name: "Indoor Plants.",
+        duration: "2 weeks",
+        image: "https://i.pinimg.com/1200x/0e/46/95/0e46957c40a7405de600c79563e4b2d2.jpg",
         status: "locked",
         requiredBadges: ["Docker Basics", "CI/CD Fundamentals", "Cloud Computing"],
-        link: "#", // ⭐ Added a placeholder link here
-        description: "Learn how to containerize applications with Docker and automate deployment pipelines using CI/CD tools." // ⭐ Description added
+        link: "https://youtu.be/zKguO4oaAGs?si=I-8LwfcI36hY5f4j", // ⭐ Added a placeholder link here
+        description: "A fully responsive website using tailwind css. 🌿" // ⭐ Description added
     },
     {
         id: "7",
-        name: "Mobile Development",
+        name: "bookStore",
         duration: "5 weeks",
-        image: "/placeholder.svg?height=200&width=300&text=Mobile",
+        image: "https://i.pinimg.com/736x/8e/48/aa/8e48aa12b5b193cdd7bf434227d2af5d.jpg",
         status: "locked",
         requiredBadges: ["React Native", "Mobile UI/UX", "App Store Guidelines"],
-        link: "#", // ⭐ Added a placeholder link here
-        description: "Build cross-platform mobile applications for iOS and Android using React Native." // ⭐ Description added
+        link: "https://youtu.be/7l5UgtWfnw0?si=rPfYXh8fqABh4PYS", // ⭐ Added a placeholder link here
+        description: "Code your own digital library from scratch 📚✨" // ⭐ Description added
     },
     {
         id: "8",
-        name: "Machine Learning Basics",
+        name: "MernChat",
         duration: "6 weeks",
-        image: "/placeholder.svg?height=200&width=300&text=ML",
+        image: "https://i.pinimg.com/1200x/26/80/32/268032f16e8d37372194dd5871dcdf01.jpg",
         status: "unlocked",
-        link: "#", // ⭐ Added a placeholder link here
-        description: "Get a solid introduction to machine learning concepts, including supervised vs. unsupervised learning and basic algorithms.", // ⭐ Description added
+        link: "https://youtu.be/mYy-d6BtqmU?si=KVitG8fxIjyhm-HU", // ⭐ Added a placeholder link here
+        description: "Chat with your friends on your own website 😎👻", // ⭐ Description added
         requiredBadges: ["Python Basics", "Statistics 101"] // ⭐ Added new badges
     },
     {
         id: "9",
-        name: "UI/UX Design Principles",
+        name: "Vid.AI",
         duration: "3.5 weeks",
-        image: "/placeholder.svg?height=200&width=300&text=UI/UX",
+        image: "https://i.pinimg.com/1200x/6e/a4/43/6ea443e8fefb3df1ea4c8ee011420336.jpg",
         status: "unlocked",
-        link: "#", // ⭐ Added a placeholder link here
-        description: "Explore the core principles of User Interface (UI) and User Experience (UX) design to create intuitive and aesthetically pleasing interfaces.", // ⭐ Description added
+        link: "https://youtu.be/c8Z73cVl6x4?si=6KdO-Ynw_aTcv_lW", // ⭐ Added a placeholder link here
+        description: "Go full-stack with Next.js, NextAuth, ImageKit, and MongoDB. 🚀", // ⭐ Description added
         requiredBadges: ["Design Principles", "Figma Fundamentals"] // ⭐ Added new badges
     },
     {
         id: "10",
-        name: "Advanced Security",
+        name: "Shallow Seek",
         duration: "4.5 weeks",
-        image: "/placeholder.svg?height=200&width=300&text=Security",
+        image: "https://i.pinimg.com/736x/4b/76/66/4b7666e84dcfc088ab98fe1009434f89.jpg",
         status: "locked",
         requiredBadges: ["Web Security Basics", "Authentication Systems", "Encryption Fundamentals"],
-        link: "#", // ⭐ Added a placeholder link here
-        description: "Master advanced web security concepts, including common vulnerabilities, authentication protocols, and data encryption techniques." // ⭐ Description added
+        link: "https://youtu.be/uJPa_18Zf1I?si=Sz6NlxGkE42W4yL1", // ⭐ Added a placeholder link here
+        description: "Your OWN AI chatbot????? 🤯🤯" // ⭐ Description added
     },
 ]
