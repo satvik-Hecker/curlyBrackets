@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,6 +11,7 @@ import { ArrowRight, Clock, Lock } from "lucide-react"
 import { motion, AnimatePresence } from 'framer-motion'
 import DarkVeil from '@/components/ui/DarkVeil'
 import { projects, Project } from '@/data/projectData'
+import { fetchUserEarnedBadges } from '@/services/badgeServices'
 
 
 
