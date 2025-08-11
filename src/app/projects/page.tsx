@@ -12,97 +12,131 @@ import { motion, AnimatePresence } from 'framer-motion'
 import DarkVeil from '@/components/ui/DarkVeil'
 import { projects, Project } from '@/data/projectData'
 import { fetchUserEarnedBadges } from '@/services/badgeServices'
+import { Badge as BadgeType } from '@/data/badgesData'
 
 
 
 
 
-function ProjectCard({ project }: { project: Project }) {
+function ProjectCard({ project, earnedBadges }: { project: Project; earnedBadges: BadgeType[] }) {
   const [isFlipped, setIsFlipped] = useState(false)
 
-  return (
+  // Check if project should be unlocked based on earned badges
+  const isUnlocked = () => {
+    if (!project.requiredBadges || project.requiredBadges.length === 0) {
+      return true; // No requirements means unlocked
+    }
+    
+    const earnedBadgeNames = earnedBadges.map(badge => badge.name);
+    return project.requiredBadges.every(requiredBadge => 
+      earnedBadgeNames.includes(requiredBadge)
+    );
+  };
+
+  const projectStatus = isUnlocked() ? "unlocked" : "locked";
+
+    return (
     <div
       className="relative h-120 w-full max-w-sm mx-auto"
       style={{ perspective: "1000px" }}
-      onMouseEnter={() => project.status === "locked" && setIsFlipped(true)}
-      onMouseLeave={() => project.status === "locked" && setIsFlipped(false)}
+      onMouseEnter={() => projectStatus === "locked" && setIsFlipped(true)}
+      onMouseLeave={() => projectStatus === "locked" && setIsFlipped(false)}
     >
       <motion.div
         className="relative w-full h-full"
         style={{ transformStyle: "preserve-3d" }}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6, ease: "easeInOut" }}
-        whileHover={project.status === "unlocked" ? { y: -8 } : {}}
+        whileHover={projectStatus === "unlocked" ? { y: -8 } : {}}
       >
         {/* Front of card */}
-        <Card className="absolute inset-0 w-full h-full overflow-hidden" style={{ backfaceVisibility: "hidden" }}>
-          <CardContent className="p-0 h-full flex flex-col">
-            <div className="relative h-48 overflow-hidden bg-gray-200">
+        <Card className="absolute inset-0 w-full h-full overflow-hidden bg-white/10 backdrop-blur-sm border border-teal-500/20 shadow-xl shadow-teal-500/10" style={{ backfaceVisibility: "hidden" }}>
+          <CardContent className="p-0 h-full flex flex-col relative">
+            {/* Background Image with Overlay */}
+            <div className="absolute inset-0 -z-10">
               <img
                 src={project.image || "/placeholder.svg"}
                 alt={project.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover scale-110 blur-sm opacity-20"
               />
-              <div className="absolute top-3 right-3">
-                {project.status === "locked" ? (
-                  <Badge variant="secondary" className="bg-red-100 text-red-700 border-red-200">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-teal-900/20 to-teal-900/40"></div>
+            </div>
+            
+            {/* Hero Image Section */}
+            <div className="relative h-56 overflow-hidden">
+              <img
+                src={project.image || "/placeholder.svg"}
+                alt={project.name}
+                className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+              
+              {/* Status Badge */}
+              <div className="absolute top-4 right-4">
+                {projectStatus === "locked" ? (
+                  <Badge variant="secondary" className="bg-red-500/90 text-white border-red-400 backdrop-blur-sm">
                     <Lock className="w-3 h-3 mr-1" />
                     Locked
                   </Badge>
                 ) : (
-                  <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
+                  <Badge variant="secondary" className="bg-teal-500/90 text-white border-teal-400 backdrop-blur-sm">
                     Unlocked
                   </Badge>
                 )}
               </div>
+              
+              {/* Project Title Overlay */}
+              <div className="absolute bottom-4 left-4 right-4">
+                <h3 className="text-xl font-bold text-white drop-shadow-lg">{project.name}</h3>
+              </div>
             </div>
 
-            <div className="p-6 flex-1 flex flex-col justify-between">
+            {/* Content Section */}
+            <div className="p-6 flex-1 flex flex-col justify-between bg-white/5 backdrop-blur-sm">
               <div>
-                <h3 className="text-xl font-semibold mb-4 text-gray-900">{project.name}</h3>
-                <p className="text-sm text-gray-600 line-clamp-2 mb-4">{project.description}</p>
-                <div className="flex items-center text-gray-600 mb-4">
+                <p className="text-sm text-gray-200 line-clamp-2 mb-4 leading-relaxed">{project.description}</p>
+                <div className="flex items-center text-teal-300 mb-4">
                   <Clock className="w-4 h-4 mr-2" />
-                  <span className="text-sm">{project.duration}</span>
+                  <span className="text-sm font-medium">{project.duration}</span>
                 </div>
               </div>
 
-              {project.status === "unlocked" && project.link && (
+              {projectStatus === "unlocked" && project.link && (
                 <Link target='_blank' href={project.link}>
-                  <Button className="w-full group">
+                  <Button className="w-full group bg-teal-600 hover:bg-teal-700 text-white border-teal-500/50 shadow-lg shadow-teal-500/25">
                     {"Let's dive in"}
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
               )}
 
-              {project.status === "locked" && (
-                <div className="text-center text-gray-500 text-sm">Hover to see requirements</div>
+              {projectStatus === "locked" && (
+                <div className="text-center text-teal-300/70 text-sm font-medium">Hover to see requirements</div>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Back of card (for locked projects) */}
-        {project.status === "locked" && (
+                         {/* Back of card (for locked projects) */}
+        {projectStatus === "locked" && (
           <Card
-            className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-50 to-gray-100"
+            className="absolute inset-0 w-full h-full bg-gradient-to-br from-teal-900/90 to-teal-800/90 backdrop-blur-sm border border-teal-500/30 shadow-xl shadow-teal-500/20"
             style={{
               backfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
             }}
           >
             <CardContent className="p-6 h-full flex flex-col justify-center items-center text-center">
-              <Lock className="w-12 h-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Required Badges</h3>
+              <Lock className="w-12 h-12 text-teal-300 mb-4" />
+              <h3 className="text-lg font-semibold mb-4 text-white">Required Badges</h3>
               <div className="space-y-2 mb-6">
                 {project.requiredBadges?.map((badge, index) => (
-                  <Badge key={badge} variant="outline" className="text-sm py-1 px-3">
+                  <Badge key={badge} variant="outline" className="text-sm py-1 px-3 bg-teal-600/20 text-teal-200 border-teal-400/50">
                     {badge}
                   </Badge>
                 ))}
               </div>
-              <p className="text-sm text-gray-600">Complete the required projects to unlock this course</p>
+              <p className="text-sm text-teal-200/80">Complete the required projects to unlock this course</p>
             </CardContent>
           </Card>
         )}
@@ -113,6 +147,30 @@ function ProjectCard({ project }: { project: Project }) {
 
 export default function ProjectPage({project}: {project: Project}){
     const [isFlipped, setisFlipped] = useState(false);
+    const [earnedBadges, setEarnedBadges] = useState<BadgeType[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+        useEffect(() => {
+      const fetchBadges = async () => {
+        try {
+          const { data: { user }, error: userError } = await supabase.auth.getUser();
+          if (userError || !user) {
+            console.error('Error getting user:', userError);
+            setIsLoading(false);
+            return;
+          }
+          
+          const badges = await fetchUserEarnedBadges(user.id);
+          setEarnedBadges(badges);
+        } catch (error) {
+          console.error('Error fetching badges:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchBadges();
+    }, []);
 
     return (
        <div className="relative w-full min-h-screen">
@@ -133,11 +191,33 @@ export default function ProjectPage({project}: {project: Project}){
         </p>
       </div>
 
-      <div className="px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center font-mono">
+            <div className="px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center font-mono">
         
-        {projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
+        {isLoading ? (
+          // Loading skeletons
+          Array.from({ length: 8 }).map((_, index) => (
+            <div key={index} className="relative h-120 w-full max-w-sm mx-auto">
+              <Card className="w-full h-full overflow-hidden">
+                <CardContent className="p-0 h-full flex flex-col">
+                  <Skeleton className="h-48 w-full" />
+                  <div className="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                      <Skeleton className="h-6 w-3/4 mb-4" />
+                      <Skeleton className="h-4 w-full mb-2" />
+                      <Skeleton className="h-4 w-2/3 mb-4" />
+                      <Skeleton className="h-4 w-1/2 mb-4" />
+                    </div>
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ))
+        ) : (
+          projects.map((project) => (
+            <ProjectCard key={project.id} project={project} earnedBadges={earnedBadges} />
+          ))
+        )}
       </div>
     </div>
   </div>
