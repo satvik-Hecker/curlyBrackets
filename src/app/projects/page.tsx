@@ -37,7 +37,7 @@ function ProjectCard({ project, earnedBadges }: { project: Project; earnedBadges
 
     return (
     <div
-      className="relative h-120 w-full max-w-sm mx-auto"
+      className="relative h-80 sm:h-96 lg:h-120 w-full max-w-xs sm:max-w-sm mx-auto"
       style={{ perspective: "1000px" }}
       onMouseEnter={() => projectStatus === "locked" && setIsFlipped(true)}
       onMouseLeave={() => projectStatus === "locked" && setIsFlipped(false)}
@@ -50,74 +50,73 @@ function ProjectCard({ project, earnedBadges }: { project: Project; earnedBadges
         whileHover={projectStatus === "unlocked" ? { y: -8 } : {}}
       >
         {/* Front of card */}
-        <Card className="absolute inset-0 w-full h-full overflow-hidden bg-white/10 backdrop-blur-sm border border-teal-500/20 shadow-xl shadow-teal-500/10" style={{ backfaceVisibility: "hidden" }}>
-          <CardContent className="p-0 h-full flex flex-col relative">
-            {/* Background Image with Overlay */}
-            <div className="absolute inset-0 -z-10">
+        <Card className="absolute inset-0 w-full  h-full overflow-hidden  bg-white/10 backdrop-blur-sm border border-teal-500/20 shadow-xl shadow-teal-500/10" style={{ backfaceVisibility: "hidden" }}>
+          <CardContent className="p-0 h-full relative ">
+            {/* Full height image covering entire card */}
+            <div className="absolute inset-0 ">
               <img
                 src={project.image || "/placeholder.svg"}
                 alt={project.name}
-                className="w-full h-full object-cover scale-110 blur-sm opacity-20"
+                className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-teal-900/20 to-teal-900/40"></div>
-            </div>
-            
-            {/* Hero Image Section */}
-            <div className="relative h-56 overflow-hidden">
-              <img
-                src={project.image || "/placeholder.svg"}
-                alt={project.name}
-                className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
               
-              {/* Status Badge */}
-              <div className="absolute top-4 right-4">
+              {/* Seamless blurred overlay for text area - only on image */}
+              <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/95 via-black/70 via-black/40 to-transparent backdrop-blur-xs"></div>
+              
+              {/* Subtle dark overlay for better text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+              
+              {/* Status Badge - Top Right */}
+              <div className="absolute top-2 right-2">
                 {projectStatus === "locked" ? (
-                  <Badge variant="secondary" className="bg-red-500/90 text-white border-red-400 backdrop-blur-sm">
-                    <Lock className="w-3 h-3 mr-1" />
+                  <Badge variant="secondary" className="bg-red-500/90 text-white border-red-400 backdrop-blur-sm text-xs">
+                    <Lock className="w-2 h-2 sm:w-3 sm:h-3 mr-1" />
                     Locked
                   </Badge>
                 ) : (
-                  <Badge variant="secondary" className="bg-teal-500/90 text-white border-teal-400 backdrop-blur-sm">
+                  <Badge variant="secondary" className="bg-teal-500/90 text-white border-teal-400 backdrop-blur-sm text-xs">
                     Unlocked
                   </Badge>
                 )}
               </div>
               
-              {/* Project Title Overlay */}
-              <div className="absolute bottom-4 left-4 right-4">
-                <h3 className="text-xl font-bold text-white drop-shadow-lg">{project.name}</h3>
-              </div>
-            </div>
-
-            {/* Content Section */}
-            <div className="p-6 flex-1 flex flex-col justify-between bg-white/5 backdrop-blur-sm">
-              <div>
-                <p className="text-sm text-gray-200 line-clamp-2 mb-4 leading-relaxed">{project.description}</p>
-                <div className="flex items-center text-teal-300 mb-4">
-                  <Clock className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-medium">{project.duration}</span>
+              {/* Content overlay */}
+              <div className="absolute bottom-3 left-3 right-3">
+                {/* Title */}
+                <h3 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg mb-2">{project.name}</h3>
+                
+                {/* Description */}
+                <p className="text-xs sm:text-sm text-gray-200 mb-3 sm:mb-4 leading-relaxed line-clamp-2">{project.description}</p>
+                
+                {/* Bottom section - Duration on left, Button on right */}
+                <div className="flex items-center justify-between">
+                  {/* Duration on left */}
+                  <div className="flex items-center text-teal-300">
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="text-xs sm:text-sm font-medium">{project.duration}</span>
+                  </div>
+                  
+                  {/* Button on right */}
+                  {projectStatus === "unlocked" && project.link && (
+                    <Link target='_blank' href={project.link}>
+                      <Button className="bg-teal-600 hover:bg-teal-700 text-white border-teal-500/50 shadow-lg shadow-teal-500/25 px-1.5 sm:px-2 py-0.5 text-xs">
+                        Let's dive in
+                      </Button>
+                    </Link>
+                  )}
+                  
+                  {projectStatus === "locked" && (
+                    <Button className="bg-gray-600 hover:bg-gray-700 text-white border-gray-500/50 shadow-lg px-1.5 sm:px-2 py-0.5 text-xs">
+                      Hover for info
+                    </Button>
+                  )}
                 </div>
               </div>
-
-              {projectStatus === "unlocked" && project.link && (
-                <Link target='_blank' href={project.link}>
-                  <Button className="w-full group bg-teal-600 hover:bg-teal-700 text-white border-teal-500/50 shadow-lg shadow-teal-500/25">
-                    {"Let's dive in"}
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-              )}
-
-              {projectStatus === "locked" && (
-                <div className="text-center text-teal-300/70 text-sm font-medium">Hover to see requirements</div>
-              )}
             </div>
           </CardContent>
         </Card>
 
-                         {/* Back of card (for locked projects) */}
+        {/* Back of card (for locked projects) */}
         {projectStatus === "locked" && (
           <Card
             className="absolute inset-0 w-full h-full bg-gradient-to-br from-teal-900/90 to-teal-800/90 backdrop-blur-sm border border-teal-500/30 shadow-xl shadow-teal-500/20"
@@ -182,21 +181,21 @@ export default function ProjectPage({project}: {project: Project}){
   <div className="h-14"></div>
   <div className="relative z-10">
     <div className="container mx-auto px-4 py-12">
-      <div className="text-center mb-12 font-mono">
-        <h1 className="text-4xl font-bold text-white mb-4">
+      <div className="text-center mb-8 sm:mb-12 font-mono">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4">
           The Dev Hub
         </h1>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg lg:text-xl text-gray-300 max-w-2xl mx-auto px-4">
           Your quest to mastery begins. Earn badges, unlock projects, and conquer the stack one challenge at a time.
         </p>
       </div>
 
-            <div className="px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center font-mono">
+            <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center font-mono">
         
         {isLoading ? (
           // Loading skeletons
           Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="relative h-120 w-full max-w-sm mx-auto">
+            <div key={index} className="relative h-80 sm:h-96 lg:h-120 w-full max-w-xs sm:max-w-sm mx-auto">
               <Card className="w-full h-full overflow-hidden">
                 <CardContent className="p-0 h-full flex flex-col">
                   <Skeleton className="h-48 w-full" />
