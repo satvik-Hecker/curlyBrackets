@@ -61,7 +61,7 @@ function ProjectCard({ project, earnedBadges }: { project: Project; earnedBadges
               />
               
               {/* Seamless blurred overlay for text area - only on image */}
-              <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/95 via-black/70 via-black/40 to-transparent backdrop-blur-xs"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/95 via-black/70  to-transparent backdrop-blur-xs"></div>
               
               {/* Subtle dark overlay for better text readability */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>

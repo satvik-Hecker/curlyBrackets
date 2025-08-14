@@ -1,181 +1,242 @@
 "use client"
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Card, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Mail, Calendar, Edit3, Save, X, User, Shield, Clock, Hash } from "lucide-react"
-import { motion, AnimatePresence } from 'framer-motion'
 
-export default function Dashboard(){
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+import { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabaseClient"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
+import { Badge as UiBadge } from "@/components/ui/badge"
+import { Mail, Calendar, Edit3, User, Shield, Clock, Hash } from "lucide-react"
+import Beams from "@/components/ui/Beam"
+import { motion } from "framer-motion"
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            const {
-                data: { user: authUser },
-                error: authError,
-            } = await supabase.auth.getUser()
+type Profile = {
+  id: string
+  name: string | null
+  email: string | null
+  avatar_url: string | null
+  created_at: string | null
+  last_login?: string | null
+}
 
-            if (authError || !authUser) {
-                setUser(null)
-                setLoading(false)
-                return
-            }
+export default function Dashboard() {
+  const [user, setUser] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
 
-            const { data: profile, error: profileError } = await supabase
-                .from("profiles")
-                .select("*")
-                .eq("id", authUser.id)
-                .single()
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: auth, error: authError } = await supabase.auth.getUser()
+      if (authError || !auth?.user) {
+        setUser(null)
+        setLoading(false)
+        return
+      }
 
-            if (profileError) {
-                console.error("Error fetching profile:", profileError)
-                setUser(null)
-            } else {
-                setUser({
-                    ...profile,
-                    email: authUser.email,
-                    last_login: authUser.last_sign_in_at,
-                    app_metadata: authUser.app_metadata
-                })
-            }
-            setLoading(false)
-        }
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", auth.user.id)
+        .single()
 
-        fetchUser()
-    }, [])
+      if (profileError || !profile) {
+        setUser({
+          id: auth.user.id,
+          name: auth.user.user_metadata?.name ?? null,
+          email: auth.user.email ?? null,
+          avatar_url: auth.user.user_metadata?.avatar_url ?? null,
+          created_at: null,
+          last_login: auth.user.last_sign_in_at ?? null,
+        })
+      } else {
+        setUser({
+          ...profile,
+          email: auth.user.email ?? profile.email,
+          last_login: auth.user.last_sign_in_at ?? null,
+        })
+      }
+      setLoading(false)
+    }
 
-    return(
-        <div className="min-h-screen bg-black w-full relative font-mono">
-            <div className="absolute inset-0 z-0" style={{ background: "radial-gradient(ellipse 90% 70% at 50% 0%, rgba(94, 234, 212, 0.3), transparent 75%), #000000" }} />
-            <div className="h-18" />
-            <main className="relative z-10 p-4 md:p-6 space-y-6 "> 
-                <div className='px-4 md:px-10 lg:px-20'>
-                    <h1 className="text-3xl md:text-4xl font-bold mb-2 text-white tracking-wider">Dashboard</h1>
-                    <p className="text-gray-300 text-sm">Welcome back, {user?.name || 'Guest'} ✨</p>
-                    
-                </div>
+    fetchUser()
+  }, [])
 
-              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 px-4 md:px-10 lg:px-20">
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.2, duration: 0.6 }}
-    whileHover={{ scale: 1.01 }}
-    className="xl:col-span-2"
-  >
-    <Card className="bg-teal-500/30 backdrop-blur-sm border-teal-700 hover:shadow-xl">
-      <CardContent className="p-6 md:p-7 text-center mb-13">
-        <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto mb-6 group">
-          
-          
-          
-        </div>
+  return (
+    <div className="relative min-h-screen w-full overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <Beams
+          beamWidth={2.9}
+          beamHeight={30}
+          beamNumber={18}
+          lightColor="#7DF2E8"
+          speed={2}
+          noiseIntensity={0.9}
+          scale={0.2}
+          rotation={30}
+        />
+      </div>
+      <div className="h-18"></div>
 
-        <div className="space-y-4">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-teal-100 break-words">John Doe</h2>
-          <Badge className="bg-teal-200/80 text-black/90 border border-teal-950 text-sm px-3 py-2 rounded-2xl">Certified DevPaglu 🌠</Badge>
-          <div className="space-y-3 text-gray-300">
-            <div className="flex items-center justify-center">
-              <Mail className="w-4 h-4 mr-2" />
-              <span className="text-sm break-all">john@example.com</span>
+      <div className="relative z-10 p-6">
+        <div className="h-10 md:h-12" />
+        <header className="container mx-auto px-4">
+          <motion.h1
+            className="font-mono text-3xl font-bold text-white drop-shadow-sm md:text-4xl"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            Welcome {user ? user.name : "Guest"}
+          </motion.h1>
+          <motion.p
+            className="mt-2 max-w-2xl font-mono text-sm text-white/70 md:text-base"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05 }}
+          >
+           Your personal dashboard overview
+          </motion.p>
+        </header>
+
+        <main className="container mx-auto px-4 py-8">
+          {loading ? (
+            <div className="grid gap-6 md:grid-cols-3">
+              <Card className="md:col-span-1">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-16 w-16 rounded-full" />
+                    <div className="flex-1">
+                      <Skeleton className="mb-2 h-5 w-40" />
+                      <Skeleton className="h-4 w-56" />
+                    </div>
+                  </div>
+                  <div className="mt-6 space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="md:col-span-2">
+                <CardContent className="p-6">
+                  <Skeleton className="mb-4 h-6 w-60" />
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <Skeleton key={i} className="h-24 w-full rounded-xl" />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-            <div className="flex items-center justify-center">
-              <Calendar className="w-4 h-4 mr-2" />
-              <span className="text-sm">Joined 01/01/2024</span>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-3">
+              <Card className="backdrop-blur supports-[backdrop-filter]:bg-white/60">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-16 w-16 ring-2 ring-white/50">
+                      <AvatarImage src={user?.avatar_url ?? undefined} />
+                      <AvatarFallback className="bg-gradient-to-br from-slate-700 to-slate-900 text-white">
+                        {user?.name?.[0]?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h2 className="truncate text-lg font-semibold text-slate-900">
+                          {user?.name || "Learner"}
+                        </h2>
+                        <UiBadge variant="secondary" className="border border-emerald-200 bg-emerald-100 text-emerald-800">
+                          <Shield className="mr-1 h-3 w-3" />
+                          Member
+                        </UiBadge>
+                      </div>
+                      <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
+                        <Mail className="h-4 w-4" />
+                        <span className="truncate">{user?.email}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid gap-3">
+                    <div className="flex items-center gap-2 text-sm text-slate-700">
+                      <Calendar className="h-4 w-4" />
+                      <span>
+                        Joined{" "}
+                        {user?.created_at
+                          ? new Date(user.created_at).toLocaleDateString()
+                          : "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-700">
+                      <Clock className="h-4 w-4" />
+                      <span>
+                        Last login{" "}
+                        {user?.last_login
+                          ? new Date(user.last_login).toLocaleString()
+                          : "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-700">
+                      <Hash className="h-4 w-4" />
+                      <span className="truncate">User ID: {user?.id}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex gap-3">
+                    <Button className="gap-2">
+                      <Edit3 className="h-4 w-4" />
+                      Edit Profile
+                    </Button>
+                    <Button variant="secondary" className="gap-2">
+                      <User className="h-4 w-4" />
+                      View Public
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="md:col-span-2 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+                <CardContent className="p-6">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h3 className="text-xl font-semibold text-slate-900">Your Stats</h3>
+                    <UiBadge variant="outline" className="border-slate-300">
+                      Weekly Focus
+                    </UiBadge>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+                      <p className="text-xs uppercase tracking-wide text-slate-500">Lessons Completed</p>
+                      <p className="mt-2 text-2xl font-bold text-slate-900">—</p>
+                    </div>
+                    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+                      <p className="text-xs uppercase tracking-wide text-slate-500">Badges Earned</p>
+                      <p className="mt-2 text-2xl font-bold text-slate-900">—</p>
+                    </div>
+                    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+                      <p className="text-xs uppercase tracking-wide text-slate-500">Projects Unlocked</p>
+                      <p className="mt-2 text-2xl font-bold text-slate-900">—</p>
+                    </div>
+                    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+                      <p className="text-xs uppercase tracking-wide text-slate-500">Streak</p>
+                      <p className="mt-2 text-2xl font-bold text-slate-900">—</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8">
+                    <h4 className="mb-3 text-lg font-semibold text-slate-900">Quick Actions</h4>
+                    <div className="flex flex-wrap gap-3">
+                      <Button>Continue Learning</Button>
+                      <Button variant="secondary">View Badges</Button>
+                      <Button variant="outline">Browse Projects</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
+          )}
+        </main>
 
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.4, duration: 0.6 }}
-    whileHover={{ scale: 1.01 }}
-  >
-    <Card className="bg-teal-100/90 backdrop-blur-xl border-white hover:shadow-xl ">
-      <CardContent className="pt-4 px-5 md:px-7">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-teal-950">Account Details</h3>
-        </div>
-
-        <div className="space-y-5 text-sm md:text-base">
-          <div>
-            <div className="flex items-center justify-between">
-              <p className="text-teal-900 font-semibold flex items-center">
-                <User className="w-4 h-4 mr-2" />Name
-              </p>
-            </div>
-            <p className="font-medium text-md break-words">John Doe</p>
-          </div>
-
-          <div>
-            <p className="text-teal-900 font-semibold flex items-center">
-              <Mail className="w-4 h-4 mr-2" /> Email Address
-            </p>
-            <div className="flex items-center justify-between">
-              <p className="font-medium break-words">john@example.com</p>
-              <Badge variant="outline" className="text-xs border-teal-700/40 text-teal-800">Not Editable</Badge>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-teal-900 font-semibold flex items-center">
-              <Hash className="w-4 h-4 mr-2" /> User ID
-            </p>
-            <div className="flex items-center justify-between">
-              <p className="font-medium break-words">abc-123-xyz</p>
-              <Badge variant="outline" className="text-xs border-teal-700/40 text-teal-800">Not Editable</Badge>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-teal-900 font-semibold flex items-center">
-              <Shield className="w-4 h-4 mr-2" /> Auth Provider
-            </p>
-            <div className="flex items-center justify-between">
-              <p className="font-medium break-words">Password</p>
-              <Badge variant="outline" className="text-xs border-teal-700/40 text-teal-800">Not Editable</Badge>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-teal-900 font-semibold flex items-center">
-              <Clock className="w-4 h-4 mr-2" /> Last Login
-            </p>
-            <div className="flex items-center justify-between">
-              <p className="font-medium break-words">07/20/2025, 12:30 PM</p>
-              <Badge variant="outline" className="text-xs border-teal-700/40 text-teal-800">Not Editable</Badge>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-300/50 pt-4">
-            <div className="bg-white/50 rounded-lg p-3 shadow-inner">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-2.5 h-2.5 bg-green-500 rounded-full mr-2" />
-                  <span className="text-sm font-semibold text-gray-800">Account Status</span>
-                </div>
-                <Badge className="bg-green-500/20 text-green-700 border-green-500/30 text-xs py-1 px-2">Active</Badge>
-              </div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
-</div>
-
-
-
-            </main>
-        </div>
-    )
+        <div className="h-16" />
+      </div>
+    </div>
+  )
 }

@@ -17,6 +17,8 @@
     "@radix-ui/react-progress": "^1.1.7",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@react-three/drei": "^10.6.1",
+    "@react-three/fiber": "^9.3.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.3",
@@ -31,7 +33,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sonner": "^2.0.5",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "three": "^0.179.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
