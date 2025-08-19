@@ -2,14 +2,17 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
-import { Badge as UiBadge } from "@/components/ui/badge"
-import { Mail, Calendar, Edit3, User, Shield, Clock, Hash } from "lucide-react"
+import { Users, Trophy, CheckCircle, RefreshCw, Star } from "lucide-react"
 import Beams from "@/components/ui/Beam"
 import { motion } from "framer-motion"
+import { Separator } from "@/components/ui/separator"
+import { countUnlockedProjects } from "@/utils/projectUtils"
+import { projects } from "@/data/projectData"
+import { badges, Badge as BadgeType } from "@/data/badgesData"
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip"
+import { fetchUserEarnedBadges } from "@/services/badgeServices"
 
 type Profile = {
   id: string
@@ -22,43 +25,84 @@ type Profile = {
 
 export default function Dashboard() {
   const [user, setUser] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [earnedBadges, setEarnedBadges] = useState<BadgeType[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [lessonsCompleted, setLessonsCompleted] = useState(0)
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: auth, error: authError } = await supabase.auth.getUser()
-      if (authError || !auth?.user) {
-        setUser(null)
-        setLoading(false)
-        return
-      }
+  const totalBadges = badges.length
+  const totalProjects = projects.length
 
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", auth.user.id)
-        .single()
+  const earnedCount = earnedBadges.length
+  const unlockedProjects = countUnlockedProjects(projects, earnedBadges)
 
-      if (profileError || !profile) {
-        setUser({
-          id: auth.user.id,
-          name: auth.user.user_metadata?.name ?? null,
-          email: auth.user.email ?? null,
-          avatar_url: auth.user.user_metadata?.avatar_url ?? null,
-          created_at: null,
-          last_login: auth.user.last_sign_in_at ?? null,
-        })
-      } else {
-        setUser({
-          ...profile,
-          email: auth.user.email ?? profile.email,
-          last_login: auth.user.last_sign_in_at ?? null,
-        })
-      }
-      setLoading(false)
+  // fetch profile data
+  const fetchUser = async () => {
+    const { data: auth, error: authError } = await supabase.auth.getUser()
+    if (authError || !auth?.user) {
+      setUser(null)
+      setIsLoading(false)
+      return
     }
 
-    fetchUser()
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", auth.user.id)
+      .single()
+
+    if (profileError || !profile) {
+      setUser({
+        id: auth.user.id,
+        name: auth.user.user_metadata?.name ?? null,
+        email: auth.user.email ?? null,
+        avatar_url: auth.user.user_metadata?.avatar_url ?? null,
+        created_at: null,
+        last_login: auth.user.last_sign_in_at ?? null,
+      })
+    } else {
+      setUser({
+        ...profile,
+        email: auth.user.email ?? profile.email,
+        last_login: auth.user.last_sign_in_at ?? null,
+      })
+    }
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          setIsLoading(false)
+          return
+        }
+
+        // 1️⃣ fetch earned badges
+        const userBadges = await fetchUserEarnedBadges(user.id)
+        setEarnedBadges(userBadges)
+
+        // 2️⃣ fetch lessons completed
+        const { count: lessonsCount, error: lessonsError } = await supabase
+          .from("lesson_progress")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("completed", true)
+
+        if (!lessonsError) {
+          setLessonsCompleted(lessonsCount || 0)
+        }
+
+        // 3️⃣ fetch profile info
+        await fetchUser()
+      } catch (err) {
+        console.error("Error loading dashboard:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
   }, [])
 
   return (
@@ -75,10 +119,10 @@ export default function Dashboard() {
           rotation={30}
         />
       </div>
-      <div className="h-18"></div>
 
       <div className="relative z-10 p-6">
-        <div className="h-10 md:h-12" />
+        <div className="h-14 md:h-18" />
+        <Separator className="bg-teal-700 mb-4" />
         <header className="container mx-auto px-4">
           <motion.h1
             className="font-mono text-3xl font-bold text-white drop-shadow-sm md:text-4xl"
@@ -94,12 +138,12 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.05 }}
           >
-           Your personal dashboard overview
+            Your personal dashboard overview
           </motion.p>
         </header>
 
         <main className="container mx-auto px-4 py-8">
-          {loading ? (
+          {isLoading ? (
             <div className="grid gap-6 md:grid-cols-3">
               <Card className="md:col-span-1">
                 <CardContent className="p-6">
@@ -129,107 +173,97 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-3">
-              <Card className="backdrop-blur supports-[backdrop-filter]:bg-white/60">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16 ring-2 ring-white/50">
-                      <AvatarImage src={user?.avatar_url ?? undefined} />
-                      <AvatarFallback className="bg-gradient-to-br from-slate-700 to-slate-900 text-white">
-                        {user?.name?.[0]?.toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h2 className="truncate text-lg font-semibold text-slate-900">
-                          {user?.name || "Learner"}
-                        </h2>
-                        <UiBadge variant="secondary" className="border border-emerald-200 bg-emerald-100 text-emerald-800">
-                          <Shield className="mr-1 h-3 w-3" />
-                          Member
-                        </UiBadge>
-                      </div>
-                      <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
-                        <Mail className="h-4 w-4" />
-                        <span className="truncate">{user?.email}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 grid gap-3">
-                    <div className="flex items-center gap-2 text-sm text-slate-700">
-                      <Calendar className="h-4 w-4" />
-                      <span>
-                        Joined{" "}
-                        {user?.created_at
-                          ? new Date(user.created_at).toLocaleDateString()
-                          : "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-700">
-                      <Clock className="h-4 w-4" />
-                      <span>
-                        Last login{" "}
-                        {user?.last_login
-                          ? new Date(user.last_login).toLocaleString()
-                          : "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-700">
-                      <Hash className="h-4 w-4" />
-                      <span className="truncate">User ID: {user?.id}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex gap-3">
-                    <Button className="gap-2">
-                      <Edit3 className="h-4 w-4" />
-                      Edit Profile
-                    </Button>
-                    <Button variant="secondary" className="gap-2">
-                      <User className="h-4 w-4" />
-                      View Public
-                    </Button>
-                  </div>
+              {/* Profile Card */}
+              <Card className="bg-black/10 backdrop-blur-md text-gray-50 rounded-2xl py-4 w-full max-w-xs 
+                border border-white/20 shadow-[25px_30px_70px_0px_rgba(13,148,136,0.3)] px-6 font-mono">
+  
+                {/* Header */}
+                <CardContent className="flex justify-between items-center px-3 mb-3 p-0">
+                  <h1 className="text-lg font-semibold">Profile</h1>
+                  <RefreshCw
+                    onClick={fetchUser}
+                    className="h-5 w-5 text-gray-400 hover:text-teal-400 transition-colors duration-200 cursor-pointer"
+                  />
                 </CardContent>
-              </Card>
 
-              <Card className="md:col-span-2 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-                <CardContent className="p-6">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-slate-900">Your Stats</h3>
-                    <UiBadge variant="outline" className="border-slate-300">
-                      Weekly Focus
-                    </UiBadge>
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-2xl border bg-white p-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">Lessons Completed</p>
-                      <p className="mt-2 text-2xl font-bold text-slate-900">—</p>
-                    </div>
-                    <div className="rounded-2xl border bg-white p-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">Badges Earned</p>
-                      <p className="mt-2 text-2xl font-bold text-slate-900">—</p>
-                    </div>
-                    <div className="rounded-2xl border bg-white p-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">Projects Unlocked</p>
-                      <p className="mt-2 text-2xl font-bold text-slate-900">—</p>
-                    </div>
-                    <div className="rounded-2xl border bg-white p-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-wide text-slate-500">Streak</p>
-                      <p className="mt-2 text-2xl font-bold text-slate-900">—</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-8">
-                    <h4 className="mb-3 text-lg font-semibold text-slate-900">Quick Actions</h4>
-                    <div className="flex flex-wrap gap-3">
-                      <Button>Continue Learning</Button>
-                      <Button variant="secondary">View Badges</Button>
-                      <Button variant="outline">Browse Projects</Button>
+                {/* Avatar + Progress Ring */}
+                <CardContent className="flex flex-col items-center justify-center mb-2 p-0">
+                  <div className="relative w-24 h-24 drop-shadow-sm">
+                    <img
+                      src={
+                        user?.avatar_url ??
+                        "https://placehold.co/96x96/1e293b/d1d5db?text=User"
+                      }
+                      alt="User Profile"
+                      className="w-24 h-24 rounded-full object-cover p-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-white/20 shadow-sm"
+                    />
+                    <div className="absolute bottom-2 right-2 p-1.5 bg-teal-600 rounded-full shadow-md">
+                      <Star className="h-3.5 w-3.5 text-white" />
                     </div>
                   </div>
                 </CardContent>
+
+                {/* Name + Email */}
+                <CardContent className="flex flex-col items-center px-3 mb-3 p-0">
+                  <h2 className="text-lg font-bold">{user?.name ?? "Learner"}</h2>
+                  <p className="text-gray-400 text-sm">{user?.email ?? "—"}</p>
+                </CardContent>
+
+                {/* Stats */}
+                <CardContent className="flex justify-around items-center px-3 p-0">
+                  {/* Lessons Completed */}
+                  <div className="flex flex-col items-center">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="p-2 mb-1 bg-slate-800/60 rounded-full text-teal-400 shadow-sm cursor-default">
+                            <CheckCircle className="h-4 w-4" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>Lessons Completed</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <span className="text-base font-semibold">{lessonsCompleted}</span>
+                  </div>
+
+                  {/* Badges */}
+                  <div className="flex flex-col items-center">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="p-2 mb-1 bg-slate-800/60 rounded-full text-teal-400 shadow-sm cursor-default">
+                            <Users className="h-4 w-4" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>Badges Earned</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <span className="text-base font-semibold">{earnedCount}</span>
+                  </div>
+
+                  {/* Unlocked Projects */}
+                  <div className="flex flex-col items-center">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="p-2 mb-1 bg-slate-800/60 rounded-full text-teal-400 shadow-sm cursor-default">
+                            <Trophy className="h-4 w-4" />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>Projects unlocked</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <span className="text-base font-semibold">{unlockedProjects}</span>
+                  </div>
+                </CardContent>
+
+
               </Card>
             </div>
           )}
