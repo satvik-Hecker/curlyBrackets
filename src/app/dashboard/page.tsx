@@ -13,6 +13,7 @@ import { projects } from "@/data/projectData"
 import { badges, Badge as BadgeType } from "@/data/badgesData"
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip"
 import { fetchUserEarnedBadges } from "@/services/badgeServices"
+import { CircularProgress } from "@/components/ui/CircleProgress"
 
 type Profile = {
   id: string
@@ -58,6 +59,7 @@ export default function Dashboard() {
         .select("id, topic_srn, subtopic_id, updated_at")
         .eq("user_id", user.id)
         .eq("is_completed", true)
+        
 
       if (!lessonsError && completedLessons) {
         setLessonsCompleted(completedLessons.length)
@@ -181,8 +183,11 @@ export default function Dashboard() {
                 </CardContent>
 
                 {/* Avatar */}
+                
                 <CardContent className="flex flex-col items-center justify-center mb-2 p-0">
+                  
                   <div className="relative w-24 h-24 drop-shadow-sm">
+                    <CircularProgress progress={lessonsCompleted ? (lessonsCompleted / 49) * 100 : 0} />
                     <img
                       src={
                         user?.avatar_url ??
