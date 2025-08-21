@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Users, Trophy, CheckCircle, RefreshCw, Star } from "lucide-react"
+import { Award, LockKeyholeOpen, CheckCircle, RefreshCw, Star } from "lucide-react"
 import Beams from "@/components/ui/Beam"
 import { motion } from "framer-motion"
 import { Separator } from "@/components/ui/separator"
@@ -28,6 +28,7 @@ export default function Dashboard() {
   const [earnedBadges, setEarnedBadges] = useState<BadgeType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [lessonsCompleted, setLessonsCompleted] = useState(0)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const totalBadges = badges.length
   const totalProjects = projects.length
@@ -35,74 +36,66 @@ export default function Dashboard() {
   const earnedCount = earnedBadges.length
   const unlockedProjects = countUnlockedProjects(projects, earnedBadges)
 
-  // fetch profile data
-  const fetchUser = async () => {
-    const { data: auth, error: authError } = await supabase.auth.getUser()
-    if (authError || !auth?.user) {
-      setUser(null)
+  // 🔹 load everything (profile + badges + lessons)
+  const loadDashboard = async () => {
+    try {
+      setIsRefreshing(true)
+      setIsLoading(true)
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setUser(null)
+        return
+      }
+
+      // 1️⃣ badges
+      const userBadges = await fetchUserEarnedBadges(user.id)
+      setEarnedBadges(userBadges)
+
+      // 2️⃣ lessons
+      const { data: completedLessons, error: lessonsError } = await supabase
+        .from("lesson_progress")
+        .select("id, topic_srn, subtopic_id, updated_at")
+        .eq("user_id", user.id)
+        .eq("is_completed", true)
+
+      if (!lessonsError && completedLessons) {
+        setLessonsCompleted(completedLessons.length)
+      }
+
+      // 3️⃣ profile
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single()
+
+      if (profileError || !profile) {
+        setUser({
+          id: user.id,
+          name: user.user_metadata?.name ?? null,
+          email: user.email ?? null,
+          avatar_url: user.user_metadata?.avatar_url ?? null,
+          created_at: null,
+          last_login: user.last_sign_in_at ?? null,
+        })
+      } else {
+        setUser({
+          ...profile,
+          email: user.email ?? profile.email,
+          last_login: user.last_sign_in_at ?? null,
+        })
+      }
+    } catch (err) {
+      console.error("Error loading dashboard:", err)
+    } finally {
       setIsLoading(false)
-      return
+      setIsRefreshing(false)
     }
-
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", auth.user.id)
-      .single()
-
-    if (profileError || !profile) {
-      setUser({
-        id: auth.user.id,
-        name: auth.user.user_metadata?.name ?? null,
-        email: auth.user.email ?? null,
-        avatar_url: auth.user.user_metadata?.avatar_url ?? null,
-        created_at: null,
-        last_login: auth.user.last_sign_in_at ?? null,
-      })
-    } else {
-      setUser({
-        ...profile,
-        email: auth.user.email ?? profile.email,
-        last_login: auth.user.last_sign_in_at ?? null,
-      })
-    }
-    setIsLoading(false)
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-          setIsLoading(false)
-          return
-        }
-
-        // 1️⃣ fetch earned badges
-        const userBadges = await fetchUserEarnedBadges(user.id)
-        setEarnedBadges(userBadges)
-
-        // 2️⃣ fetch lessons completed
-        const { count: lessonsCount, error: lessonsError } = await supabase
-          .from("lesson_progress")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .eq("completed", true)
-
-        if (!lessonsError) {
-          setLessonsCompleted(lessonsCount || 0)
-        }
-
-        // 3️⃣ fetch profile info
-        await fetchUser()
-      } catch (err) {
-        console.error("Error loading dashboard:", err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchData()
+    loadDashboard()
   }, [])
 
   return (
@@ -181,12 +174,13 @@ export default function Dashboard() {
                 <CardContent className="flex justify-between items-center px-3 mb-3 p-0">
                   <h1 className="text-lg font-semibold">Profile</h1>
                   <RefreshCw
-                    onClick={fetchUser}
-                    className="h-5 w-5 text-gray-400 hover:text-teal-400 transition-colors duration-200 cursor-pointer"
+                    onClick={loadDashboard}
+                    className={`h-5 w-5 text-gray-400 hover:text-teal-400 transition-colors duration-200 cursor-pointer 
+                      ${isRefreshing ? "animate-spin text-teal-400" : ""}`}
                   />
                 </CardContent>
 
-                {/* Avatar + Progress Ring */}
+                {/* Avatar */}
                 <CardContent className="flex flex-col items-center justify-center mb-2 p-0">
                   <div className="relative w-24 h-24 drop-shadow-sm">
                     <img
@@ -211,7 +205,7 @@ export default function Dashboard() {
 
                 {/* Stats */}
                 <CardContent className="flex justify-around items-center px-3 p-0">
-                  {/* Lessons Completed */}
+                  {/* Lessons */}
                   <div className="flex flex-col items-center">
                     <TooltipProvider>
                       <Tooltip>
@@ -234,7 +228,7 @@ export default function Dashboard() {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="p-2 mb-1 bg-slate-800/60 rounded-full text-teal-400 shadow-sm cursor-default">
-                            <Users className="h-4 w-4" />
+                            <Award className="h-4 w-4" />
                           </div>
                         </TooltipTrigger>
                         <TooltipContent side="top">
@@ -245,13 +239,13 @@ export default function Dashboard() {
                     <span className="text-base font-semibold">{earnedCount}</span>
                   </div>
 
-                  {/* Unlocked Projects */}
+                  {/* Projects */}
                   <div className="flex flex-col items-center">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="p-2 mb-1 bg-slate-800/60 rounded-full text-teal-400 shadow-sm cursor-default">
-                            <Trophy className="h-4 w-4" />
+                            <LockKeyholeOpen className="h-4 w-4" />
                           </div>
                         </TooltipTrigger>
                         <TooltipContent side="top">
@@ -262,8 +256,6 @@ export default function Dashboard() {
                     <span className="text-base font-semibold">{unlockedProjects}</span>
                   </div>
                 </CardContent>
-
-
               </Card>
             </div>
           )}
