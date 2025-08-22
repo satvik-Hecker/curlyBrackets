@@ -1,5 +1,4 @@
 
-
 export type DailyQuest = {
   id: number
   title: string
