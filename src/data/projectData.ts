@@ -66,7 +66,7 @@ export const projects: Project[] = [
         duration: "2 weeks",
         image: "https://i.pinimg.com/1200x/0e/46/95/0e46957c40a7405de600c79563e4b2d2.jpg",
         status: "locked",
-        requiredBadges: ["The last Tailwinder", "Flexecutioner"],
+        requiredBadges: ["The Last Tailwinder", "Flexecutioner"],
         link: "https://youtu.be/zKguO4oaAGs?si=I-8LwfcI36hY5f4j",
         description: "A fully responsive website using Tailwind CSS. 🌿"
     },

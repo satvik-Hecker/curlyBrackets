@@ -11,9 +11,9 @@ import { Separator } from "@/components/ui/separator"
 import { countUnlockedProjects } from "@/utils/projectUtils"
 import { projects } from "@/data/projectData"
 import { badges, Badge as BadgeType } from "@/data/badgesData"
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip"
 import { fetchUserEarnedBadges } from "@/services/badgeServices"
 import { CircularProgress } from "@/components/ui/CircleProgress"
+import { LessonProgressCard } from "@/components/ui/LessonProgressCard"
 
 type Profile = {
   id: string
@@ -31,13 +31,9 @@ export default function Dashboard() {
   const [lessonsCompleted, setLessonsCompleted] = useState(0)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const totalBadges = badges.length
-  const totalProjects = projects.length
-
   const earnedCount = earnedBadges.length
   const unlockedProjects = countUnlockedProjects(projects, earnedBadges)
 
-  // 🔹 load everything (profile + badges + lessons)
   const loadDashboard = async () => {
     try {
       setIsRefreshing(true)
@@ -49,23 +45,20 @@ export default function Dashboard() {
         return
       }
 
-      // 1️⃣ badges
+      // badges
       const userBadges = await fetchUserEarnedBadges(user.id)
       setEarnedBadges(userBadges)
 
-      // 2️⃣ lessons
-      const { data: completedLessons, error: lessonsError } = await supabase
+      // lessons
+      const { data: completedLessons } = await supabase
         .from("lesson_progress")
-        .select("id, topic_srn, subtopic_id, updated_at")
+        .select("id, topic_srn, subtopic_id")
         .eq("user_id", user.id)
         .eq("is_completed", true)
-        
 
-      if (!lessonsError && completedLessons) {
-        setLessonsCompleted(completedLessons.length)
-      }
+      if (completedLessons) setLessonsCompleted(completedLessons.length)
 
-      // 3️⃣ profile
+      // profile
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
@@ -102,6 +95,7 @@ export default function Dashboard() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
+      {/* Background Beams */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <Beams
           beamWidth={2.9}
@@ -115,10 +109,12 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="relative z-10 p-6">
-        <div className="h-14 md:h-18" />
-        <Separator className="bg-teal-700 mb-4" />
-        <header className="container mx-auto px-4">
+      {/* Content */}
+      <div className="relative z-10 px-4 sm:px-6 lg:px-12 py-10">
+        <Separator className="bg-teal-700 mb-6 mt-8" />
+
+        {/* Header */}
+        <header className="container mx-auto ">
           <motion.h1
             className="font-mono text-3xl font-bold text-white drop-shadow-sm md:text-4xl"
             initial={{ opacity: 0, y: 6 }}
@@ -128,7 +124,7 @@ export default function Dashboard() {
             Welcome {user ? user.name : "Guest"}
           </motion.h1>
           <motion.p
-            className="mt-2 max-w-2xl font-mono text-sm text-white/70 md:text-base"
+            className="mt-2 max-w-2xl  font-mono text-sm text-white/70 md:text-base"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.05 }}
@@ -137,136 +133,92 @@ export default function Dashboard() {
           </motion.p>
         </header>
 
-        <main className="container mx-auto px-4 py-8">
+        {/* Main Grid */}
+        <main className="container mx-auto mt-10">
           {isLoading ? (
-            <div className="grid gap-6 md:grid-cols-3">
-              <Card className="md:col-span-1">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <Skeleton className="h-16 w-16 rounded-full" />
-                    <div className="flex-1">
-                      <Skeleton className="mb-2 h-5 w-40" />
-                      <Skeleton className="h-4 w-56" />
-                    </div>
-                  </div>
-                  <div className="mt-6 space-y-2">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-2/3" />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {/* Profile Skeleton */}
+              <Card className="bg-black/20 border border-white/10 rounded-2xl p-6">
+                <CardContent className="flex flex-col items-center space-y-4">
+                  <Skeleton className="h-24 w-24 rounded-full bg-slate-800/50" />
+                  <Skeleton className="h-5 w-32 bg-slate-800/50" />
+                  <Skeleton className="h-4 w-48 bg-slate-800/50" />
+                  <div className="flex justify-around w-full mt-4">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-6 w-16 bg-slate-800/50" />
+                    ))}
                   </div>
                 </CardContent>
               </Card>
-              <Card className="md:col-span-2">
-                <CardContent className="p-6">
-                  <Skeleton className="mb-4 h-6 w-60" />
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                      <Skeleton key={i} className="h-24 w-full rounded-xl" />
+
+              {/* Lesson Card Skeleton */}
+              <Card className="md:col-span-1 lg:col-span-2 bg-black/20 border border-white/10 rounded-2xl p-6">
+                <CardContent>
+                  <Skeleton className="h-6 w-40 mb-4 bg-slate-800/50" />
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <Skeleton key={i} className="h-24 rounded-xl bg-slate-800/50" />
                     ))}
                   </div>
                 </CardContent>
               </Card>
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* Profile Card */}
-              <Card className="bg-black/10 backdrop-blur-md text-gray-50 rounded-2xl py-4 w-full max-w-xs 
-                border border-white/20 shadow-[25px_30px_70px_0px_rgba(13,148,136,0.3)] px-6 font-mono">
-  
+              <Card className="bg-black/10 backdrop-blur-md text-gray-50 rounded-2xl p-6 border border-white/20 shadow-lg font-mono">
                 {/* Header */}
-                <CardContent className="flex justify-between items-center px-3 mb-3 p-0">
+                <div className="flex justify-between items-center mb-4">
                   <h1 className="text-lg font-semibold">Profile</h1>
                   <RefreshCw
                     onClick={loadDashboard}
-                    className={`h-5 w-5 text-gray-400 hover:text-teal-400 transition-colors duration-200 cursor-pointer 
-                      ${isRefreshing ? "animate-spin text-teal-400" : ""}`}
+                    className={`h-5 w-5 text-gray-400 hover:text-teal-400 transition-colors cursor-pointer ${
+                      isRefreshing ? "animate-spin text-teal-400" : ""
+                    }`}
                   />
-                </CardContent>
+                </div>
 
-                {/* Avatar */}
-                
-                <CardContent className="flex flex-col items-center justify-center mb-2 p-0">
-                  
-                  <div className="relative w-24 h-24 drop-shadow-sm">
+                {/* Avatar + Progress */}
+                <div className="flex flex-col items-center mb-4">
+                  <div className="relative w-24 h-24">
                     <CircularProgress progress={lessonsCompleted ? (lessonsCompleted / 49) * 100 : 0} />
                     <img
-                      src={
-                        user?.avatar_url ??
-                        "https://placehold.co/96x96/1e293b/d1d5db?text=User"
-                      }
+                      src={user?.avatar_url ?? "https://placehold.co/96x96/1e293b/d1d5db?text=User"}
                       alt="User Profile"
-                      className="w-24 h-24 rounded-full object-cover p-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-white/20 shadow-sm"
+                      className="w-24 h-24 rounded-full object-cover p-1 absolute inset-0 m-auto border border-white/20"
                     />
                     <div className="absolute bottom-2 right-2 p-1.5 bg-teal-600 rounded-full shadow-md">
                       <Star className="h-3.5 w-3.5 text-white" />
                     </div>
                   </div>
-                </CardContent>
-
-                {/* Name + Email */}
-                <CardContent className="flex flex-col items-center px-3 mb-3 p-0">
-                  <h2 className="text-lg font-bold">{user?.name ?? "Learner"}</h2>
+                  <h2 className="mt-3 text-lg font-bold">{user?.name ?? "Learner"}</h2>
                   <p className="text-gray-400 text-sm">{user?.email ?? "—"}</p>
-                </CardContent>
+                </div>
 
                 {/* Stats */}
-                <CardContent className="flex justify-around items-center px-3 p-0">
-                  {/* Lessons */}
-                  <div className="flex flex-col items-center">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="p-2 mb-1 bg-slate-800/60 rounded-full text-teal-400 shadow-sm cursor-default">
-                            <CheckCircle className="h-4 w-4" />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                          <p>Lessons Completed</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    <span className="text-base font-semibold">{lessonsCompleted}</span>
+                <div className="flex justify-around text-center">
+                  <div>
+                    <CheckCircle className="mx-auto h-5 w-5 text-teal-400" />
+                    <p className="text-sm mt-1">{lessonsCompleted} Lessons</p>
                   </div>
-
-                  {/* Badges */}
-                  <div className="flex flex-col items-center">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="p-2 mb-1 bg-slate-800/60 rounded-full text-teal-400 shadow-sm cursor-default">
-                            <Award className="h-4 w-4" />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                          <p>Badges Earned</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    <span className="text-base font-semibold">{earnedCount}</span>
+                  <div>
+                    <Award className="mx-auto h-5 w-5 text-teal-400" />
+                    <p className="text-sm mt-1">{earnedCount} Badges</p>
                   </div>
-
-                  {/* Projects */}
-                  <div className="flex flex-col items-center">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="p-2 mb-1 bg-slate-800/60 rounded-full text-teal-400 shadow-sm cursor-default">
-                            <LockKeyholeOpen className="h-4 w-4" />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                          <p>Projects unlocked</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    <span className="text-base font-semibold">{unlockedProjects}</span>
+                  <div>
+                    <LockKeyholeOpen className="mx-auto h-5 w-5 text-teal-400" />
+                    <p className="text-sm mt-1">{unlockedProjects} Projects</p>
                   </div>
-                </CardContent>
+                </div>
               </Card>
+
+              {/* Lesson Progress Card */}
+              <div className="md:col-span-1 lg:col-span-2">
+                <LessonProgressCard isLoading={isLoading} />
+              </div>
             </div>
           )}
         </main>
-
-        <div className="h-16" />
       </div>
     </div>
   )
