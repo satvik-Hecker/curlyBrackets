@@ -145,7 +145,7 @@ function ProjectCard({ project, earnedBadges }: { project: Project; earnedBadges
   )
 }
 
-export default function ProjectPage({project}: {project: Project}){
+export default function ProjectPage(){
     const [isFlipped, setisFlipped] = useState(false);
     const [earnedBadges, setEarnedBadges] = useState<BadgeType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
