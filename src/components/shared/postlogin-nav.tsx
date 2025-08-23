@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Lock } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
@@ -23,21 +23,19 @@ const menuItems = [
 ]
 
 export default function PostLoginNavbar() {
-  const [menuState, setMenuState] = React.useState(false)
-  const [isScrolled, setIsScrolled] = React.useState(false)
+  const [menuState, setMenuState] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [userInitial, setUserInitial] = useState("U")
   const router = useRouter()
 
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50)
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // 🔑 Fetch user profile (avatar + name)
+  // Fetch user profile (avatar + initial)
   useEffect(() => {
     const fetchProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -62,9 +60,7 @@ export default function PostLoginNavbar() {
     setMenuState(false)
     if (href.startsWith("#")) {
       const element = document.querySelector(href)
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" })
-      }
+      if (element) element.scrollIntoView({ behavior: "smooth", block: "start" })
     } else {
       router.push(href)
     }
@@ -77,26 +73,18 @@ export default function PostLoginNavbar() {
   }
 
   return (
-    <nav
-      data-state={menuState && "active"}
-      className="fixed z-20 w-full px-2"
-    >
+    <nav data-state={menuState && "active"} className="fixed z-20 w-full px-2">
       <div
         className={cn(
           "mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 border-teal-700 rounded-xl lg:px-12",
-          isScrolled &&
-            "bg-teal-300/20 max-w-4xl border rounded-2xl backdrop-blur-lg lg:px-5"
+          isScrolled && "bg-teal-300/20 max-w-4xl border rounded-2xl backdrop-blur-lg lg:px-5"
         )}
       >
         <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
           {/* Logo + Avatar + Hamburger */}
           <div className="flex w-full items-center justify-between lg:w-auto">
             {/* Logo */}
-            <Link
-              href="/"
-              aria-label="home"
-              className="flex items-center space-x-2"
-            >
+            <Link href="/" aria-label="home" className="flex items-center space-x-2">
               <div className="flex items-center space-x-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-teal-300 to-teal-700 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">
                   <svg
@@ -128,9 +116,7 @@ export default function PostLoginNavbar() {
                 <DropdownMenuTrigger asChild>
                   <Avatar className="ring-1 ring-teal-500 transition drop-shadow-[0_0_10px_rgba(45,212,191,0.4)] hover:ring-teal-300 cursor-pointer">
                     <AvatarImage src={avatarUrl ?? ""} />
-                    <AvatarFallback className="bg-zinc-800 text-white">
-                      {userInitial}
-                    </AvatarFallback>
+                    <AvatarFallback className="bg-zinc-800 text-white">{userInitial}</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
@@ -142,10 +128,7 @@ export default function PostLoginNavbar() {
                     <Link href="/profile">My Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-zinc-700" />
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="text-red-400 hover:!text-red-400"
-                  >
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:!text-red-400">
                     Log Out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -186,9 +169,7 @@ export default function PostLoginNavbar() {
               <DropdownMenuTrigger asChild>
                 <Avatar className="ring-1 ring-teal-500 transition hover:ring-teal-300 cursor-pointer drop-shadow-[0_0_10px_rgba(45,212,191,0.4)]">
                   <AvatarImage src={avatarUrl ?? ""} />
-                  <AvatarFallback className="bg-zinc-800 text-white">
-                    {userInitial}
-                  </AvatarFallback>
+                  <AvatarFallback className="bg-zinc-800 text-white">{userInitial}</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -200,16 +181,34 @@ export default function PostLoginNavbar() {
                   <Link href="/profile">My Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-zinc-700" />
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-red-400 hover:!text-red-400"
-                >
+                <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:!text-red-400">
                   Log Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
+
+        {/* Mobile / Tab View Menu */}
+{menuState && (
+  <div className="bg-zinc-950 lg:hidden mb-6 w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border-zinc-800 border p-6 shadow-2xl shadow-zinc-300/20">
+    <ul className="space-y-6 text-base font-mono">
+      {menuItems.map((item, index) => (
+        <li key={index}>
+          <Link
+            href={item.href}
+            onClick={() => handleMenuClick(item.href)}
+            className="text-white hover:text-zinc-400 block duration-150 cursor-pointer"
+          >
+            <span>{item.name}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+
       </div>
     </nav>
   )
