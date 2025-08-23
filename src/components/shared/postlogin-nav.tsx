@@ -1,5 +1,5 @@
 "use client"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import {
@@ -25,6 +25,8 @@ const menuItems = [
 export default function PostLoginNavbar() {
   const [menuState, setMenuState] = React.useState(false)
   const [isScrolled, setIsScrolled] = React.useState(false)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [userInitial, setUserInitial] = useState("U")
   const router = useRouter()
 
   React.useEffect(() => {
@@ -33,6 +35,27 @@ export default function PostLoginNavbar() {
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // 🔑 Fetch user profile (avatar + name)
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) return
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("name, avatar_url")
+        .eq("id", session.user.id)
+        .single()
+
+      if (!error && profile) {
+        setAvatarUrl(profile.avatar_url)
+        if (profile.name) setUserInitial(profile.name.charAt(0).toUpperCase())
+      }
+    }
+
+    fetchProfile()
   }, [])
 
   const handleMenuClick = (href: string) => {
@@ -45,6 +68,12 @@ export default function PostLoginNavbar() {
     } else {
       router.push(href)
     }
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push("/")
+    toast.success("Logged out successfully")
   }
 
   return (
@@ -98,9 +127,9 @@ export default function PostLoginNavbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar className="ring-1 ring-teal-500 transition drop-shadow-[0_0_10px_rgba(45,212,191,0.4)] hover:ring-teal-300 cursor-pointer">
-                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarImage src={avatarUrl ?? ""} />
                     <AvatarFallback className="bg-zinc-800 text-white">
-                      U
+                      {userInitial}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
@@ -109,20 +138,13 @@ export default function PostLoginNavbar() {
                   sideOffset={8}
                   align="end"
                 >
-                  <DropdownMenuItem
-                    asChild
-                    className="hover:!bg-zinc-800 hover:!text-white px-3 py-2 rounded-md cursor-pointer"
-                  >
+                  <DropdownMenuItem asChild>
                     <Link href="/profile">My Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-zinc-700" />
                   <DropdownMenuItem
-                    onClick={async () => {
-                      await supabase.auth.signOut()
-                      router.push("/")
-                      toast.success("Logged out successfully")
-                    }}
-                    className="hover:!bg-zinc-800 px-3 py-2 rounded-md text-red-400 hover:!text-red-400 cursor-pointer"
+                    onClick={handleLogout}
+                    className="text-red-400 hover:!text-red-400"
                   >
                     Log Out
                   </DropdownMenuItem>
@@ -157,57 +179,35 @@ export default function PostLoginNavbar() {
               ))}
             </ul>
           </div>
-          <div className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Avatar className="ring-1 ring-teal-500 transition hover:ring-teal-300 cursor-pointer drop-shadow-[0_0_10px_rgba(45,212,191,0.4)]">
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback className="bg-zinc-800 text-white">U</AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-48 rounded-xl font-mono border border-zinc-700 bg-zinc-900 text-white shadow-lg shadow-zinc-900 p-3"
-                  sideOffset={8}
-                  align="end"
-                >
-                  <DropdownMenuItem
-                    asChild
-                    className="hover:!bg-zinc-800 hover:!text-white px-3 py-2 rounded-md cursor-pointer"
-                  >
-                    <Link href="/profile">My Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-zinc-700" />
-                  <DropdownMenuItem
-                    onClick={async () => {
-                      await supabase.auth.signOut()
-                      router.push("/")
-                      toast.success("Logged out successfully")
-                    }}
-                    className="hover:!bg-zinc-800 px-3 py-2 rounded-md text-red-400 hover:!text-red-400 cursor-pointer"
-                  >
-                    Log Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
 
-          {/* Mobile Nav Menu */}
-          <div className="bg-zinc-950 in-data-[state=active]:block lg:in-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border-zinc-800 border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
-            <div className="lg:hidden">
-              <ul className="space-y-6 text-base font-mono">
-                {menuItems.map((item, index) => (
-                  <li key={index}>
-                    <Link
-                      href={item.href}
-                      onClick={() => handleMenuClick(item.href)}
-                      className="block cursor-pointer text-white duration-150 hover:text-zinc-400"
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Desktop Avatar */}
+          <div className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="ring-1 ring-teal-500 transition hover:ring-teal-300 cursor-pointer drop-shadow-[0_0_10px_rgba(45,212,191,0.4)]">
+                  <AvatarImage src={avatarUrl ?? ""} />
+                  <AvatarFallback className="bg-zinc-800 text-white">
+                    {userInitial}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-48 rounded-xl font-mono border border-zinc-700 bg-zinc-900 text-white shadow-lg shadow-zinc-900 p-3"
+                sideOffset={8}
+                align="end"
+              >
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">My Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-zinc-700" />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-red-400 hover:!text-red-400"
+                >
+                  Log Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

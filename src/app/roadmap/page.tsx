@@ -10,6 +10,7 @@ import Link from "next/link"
 import { supabase } from "@/lib/supabaseClient"
 import { subtopics } from "@/data/subtopics"
 import { Progress } from "@/components/ui/progress"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
 const getDifficultyColor = (difficulty: string) => {
   switch (difficulty) {
@@ -74,6 +75,7 @@ export default function RoadmapPage() {
   const visibleTopics = topics.slice(currIndex, currIndex + cardsPerView);
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen w-full relative bg-black font-mono">
       <div
         className="absolute inset-0 z-0"
@@ -239,5 +241,6 @@ export default function RoadmapPage() {
         }
       `}</style>
     </div>
+    </ProtectedRoute>
   );
 }

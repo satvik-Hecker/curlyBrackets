@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Mail, Calendar, Edit3, Save, X, User, Shield, Clock, Hash } from "lucide-react"
 import { motion, AnimatePresence } from 'framer-motion'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null)
@@ -126,6 +127,7 @@ export default function ProfilePage() {
   const authProvider = user?.app_metadata?.provider || 'Email/Password';
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen bg-black w-full relative font-mono">
       <div className="absolute inset-0 z-0" style={{ background: "radial-gradient(ellipse 90% 70% at 50% 0%, rgba(94, 234, 212, 0.3), transparent 75%), #000000" }} />
       <div className="h-18" />
@@ -254,5 +256,6 @@ export default function ProfilePage() {
         </div>
       </main>
     </div>
+    </ProtectedRoute>
   )
 }

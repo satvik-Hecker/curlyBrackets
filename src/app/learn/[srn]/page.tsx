@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Clock, Star, BookOpen } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface Topic {
   srn: number;
@@ -124,6 +125,7 @@ export default function LearnTopicPage({ params }: { params: Promise<{ srn: stri
   };
 
   return (
+    <ProtectedRoute>
     <AnimatePresence mode="wait">
       <div
   
@@ -258,5 +260,6 @@ export default function LearnTopicPage({ params }: { params: Promise<{ srn: stri
         </motion.div>
       </div>
     </AnimatePresence>
+    </ProtectedRoute>
   );
 }

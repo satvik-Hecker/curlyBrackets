@@ -13,6 +13,7 @@ import DarkVeil from '@/components/ui/DarkVeil'
 import { projects, Project } from '@/data/projectData'
 import { fetchUserEarnedBadges } from '@/services/badgeServices'
 import { Badge as BadgeType } from '@/data/badgesData'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 
 
@@ -172,6 +173,7 @@ export default function ProjectPage({project}: {project: Project}){
     }, []);
 
     return (
+      <ProtectedRoute>
        <div className="relative w-full min-h-screen">
   
   <div className="absolute top-0 left-0 w-full h-full">
@@ -196,17 +198,17 @@ export default function ProjectPage({project}: {project: Project}){
           // Loading skeletons
           Array.from({ length: 8 }).map((_, index) => (
             <div key={index} className="relative h-80 sm:h-96 lg:h-120 w-full max-w-xs sm:max-w-sm mx-auto">
-              <Card className="w-full h-full overflow-hidden">
+              <Card className="w-full h-full overflow-hidden bg-teal-950/30 border-teal-950">
                 <CardContent className="p-0 h-full flex flex-col">
-                  <Skeleton className="h-48 w-full" />
+                  <Skeleton className="h-48 w-full bg-teal-950" />
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
-                      <Skeleton className="h-6 w-3/4 mb-4" />
-                      <Skeleton className="h-4 w-full mb-2" />
-                      <Skeleton className="h-4 w-2/3 mb-4" />
-                      <Skeleton className="h-4 w-1/2 mb-4" />
+                      <Skeleton className="h-6 w-3/4 mb-4 bg-teal-950" />
+                      <Skeleton className="h-4 w-full mb-2 bg-teal-950" />
+                      <Skeleton className="h-4 w-2/3 mb-4 bg-teal-950" />
+                      <Skeleton className="h-4 w-1/2 mb-4 bg-teal-950" />
                     </div>
-                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full bg-teal-950" />
                   </div>
                 </CardContent>
               </Card>
@@ -221,6 +223,7 @@ export default function ProjectPage({project}: {project: Project}){
     </div>
   </div>
 </div>
+</ProtectedRoute>
 
 
     )

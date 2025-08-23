@@ -82,7 +82,7 @@ export function SignupForm({
     if (error) {
       toast.error("Signup failed", { description: error.message })
     } else {
-      toast.success("Signup successful!", {
+      toast.success("Email sent successfully!", {
         description: "Check your email to confirm your account.",
       })
       

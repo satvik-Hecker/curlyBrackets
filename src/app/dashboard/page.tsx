@@ -16,6 +16,7 @@ import { CircularProgress } from "@/components/ui/CircleProgress"
 import { LessonProgressCard } from "@/components/ui/LessonProgressCard"
 import DailyQuestsCard from "@/components/ui/DailyQuestCard"
 import { BadgeCard } from "@/components/ui/badgesCard"
+import ProtectedRoute from "@/components/ProtectedRoute"
 
 type Profile = {
   id: string
@@ -85,6 +86,7 @@ export default function Dashboard() {
   }, [])
 
   return (
+    <ProtectedRoute>
     <div className="relative min-h-screen w-full overflow-hidden">
       {/* Background Beams */}
       <div className="pointer-events-none absolute inset-0 -z-10">
@@ -224,5 +226,6 @@ export default function Dashboard() {
         </main>
       </div>
     </div>
+    </ProtectedRoute>
   )
 }

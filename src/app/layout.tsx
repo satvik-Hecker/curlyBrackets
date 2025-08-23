@@ -41,29 +41,35 @@ export default function RootLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data: { user }, error } = await supabase.auth.getUser()
-        if (error) {
-          console.error("Error getting user:", error)
-        }
-        setUser(user)
-      } catch (error) {
-        console.error("Unexpected error getting user:", error)
-      } finally {
-        setLoading(false)
+  const getUser = async () => {
+    try {
+      // first get session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError) throw sessionError
+
+      if (session) {
+        setUser(session.user)
+      } else {
+        setUser(null)
       }
+    } catch (error) {
+      console.error("Error getting session/user:", error)
+      setUser(null)
+    } finally {
+      setLoading(false)
     }
-    getUser()
+  }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
+  getUser()
 
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null)
+  })
+
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [])
   return (
     <html lang="en" className={`${geistMono.variable} ${castoro.variable}`}>
       <body className='bg-black'>
