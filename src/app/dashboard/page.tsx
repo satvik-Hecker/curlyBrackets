@@ -166,7 +166,7 @@ export default function Dashboard() {
 
                     <div className="flex flex-col items-center mb-4">
                       <div className="relative w-24 h-24">
-                        <CircularProgress progress={lessonsCompleted ? (lessonsCompleted / 51) * 100 : 0} />
+                        <CircularProgress progress={lessonsCompleted ? (lessonsCompleted / 52) * 100 : 0} />
                         <img
                           src={user?.avatar_url ?? "https://placehold.co/96x96/1e293b/d1d5db?text=User"}
                           alt="User Profile"

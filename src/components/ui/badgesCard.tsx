@@ -146,7 +146,7 @@ export function BadgeCard() {
               <h3 className="text-base md:text-lg font-semibold text-foreground mb-2 font-mono">
                 {selectedBadge.name}
               </h3>
-              <p className="text-sm md:text-base text-muted-foreground font-mono">
+              <p className="text-sm md:text-base text-gray-800 font-semibold font-mono">
                 {selectedBadge.description}
               </p>
              

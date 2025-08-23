@@ -42,42 +42,43 @@ export const subtopics = {
   ],
   
   6: [
-    { id: "n1", title: "Overview", type: "video", duration: "6m", url: "https://youtube.com" },
-    { id: "n2", title: "Backend Tools and Technologies", type: "doc", duration: "8 min read", url: "https://youtube.com" },
-    { id: "n3", title: "Node.js", type: "video", duration: "10m", url: "https://youtube.com" },
-    { id: "n4", title: "Express", type: "video", duration: "9m", url: "https://youtube.com" },
+    { id: "n1", title: "Overview", type: "video", duration: "12m", url: "https://youtu.be/XBu54nfzxAQ?si=17EO1br3DTRA6YQD" },
+    { id: "n2", title: "Backend Tools and Technologies", type: "video", duration: "10m", url: "https://youtu.be/tN6oJu2DqCM?si=XzjrY71H_kz0nsoc" },
+    { id: "n3", title: "Node.js", type: "video", duration: "1h 15m", url: "https://youtu.be/TlB_eWDSMt4?si=BWtpDyEbWhMJWzee" },
+    { id: "n4", title: "Express", type: "video", duration: "36m", url: "https://youtu.be/SccSCuHhOw0?si=wG1IIavWpV7zYi7E" },
+    { id: "n5", title: "PathMern Doc", type: "doc", duration: "40m read", url: "https://github.com/parthmern/Backend" },
   ],
   
   7: [
-    { id: "e1", title: "Creating First Server with Express", type: "video", duration: "9m", url: "https://youtube.com" },
-    { id: "e2", title: "HTTP Requests", type: "video", duration: "7m", url: "https://youtube.com" },
-    { id: "e3", title: "Postman", type: "video", duration: "6m", url: "https://youtube.com" },
-    { id: "e4", title: "Middlewares", type: "video", duration: "10m", url: "https://youtube.com" },
-    { id: "e5", title: "REST API", type: "video", duration: "8m", url: "https://youtube.com" },
-    { id: "e6", title: "GraphQL API", type: "video", duration: "11m", url: "https://youtube.com" },
+    { id: "e1", title: "Creating First Server with Express", type: "video", duration: "11m", url: "https://youtu.be/N2-FyBBxOZA?si=OfyFZt89J0iVvEkw" },
+    { id: "e2", title: "HTTP Requests", type: "video", duration: "24m", url: "https://youtu.be/qgZiUvV41TI?si=SyJhmAFd4rwqjEK3" },
+    { id: "e3", title: "Postman", type: "video", duration: "30m", url: "https://youtu.be/4-DmsxM347k?si=Dgj9l9pvFJqbdrZ_" },
+    { id: "e4", title: "Middlewares", type: "video", duration: "20m", url: "https://youtu.be/n2c0mf1sza4?si=-CmMjw60vEvsMJMm" },
+    { id: "e5", title: "REST API", type: "video", duration: "15m", url: "https://youtu.be/cJAyEOZQUQY?si=kS4TwGfn8Yi6BgQJ" },
+    { id: "e6", title: "GraphQL API", type: "video", duration: "42m", url: "https://youtu.be/WtkKwO1viI8?si=uFpg8jnToteRPexY" },
   ],
   
   8: [ // Database
-    { id: "db1", title: "Different type of Database", type: "doc", duration: "7 min read", url: "https://youtube.com" },
-    { id: "db2", title: "No SQL vs SQL", type: "video", duration: "5m", url: "https://youtube.com" },
-    { id: "db3", title: "MongoDB in one shot", type: "video", duration: "12m", url: "https://youtube.com" },
-    { id: "db4", title: "Postgres DB", type: "video", duration: "8m", url: "https://youtube.com" },
-    { id: "db5", title: "Prisma", type: "video", duration: "6m", url: "https://youtube.com" },
+    { id: "db1", title: "Different type of Database", type: "doc", duration: "7 min read", url: "https://www.geeksforgeeks.org/dbms/types-of-databases/" },
+    { id: "db2", title: "No SQL vs SQL", type: "video", duration: "11m", url: "https://youtu.be/ruz-vK8IesE?si=uLuaOnkOYMXOZiY1" },
+    { id: "db3", title: "MongoDB in one shot", type: "video", duration: "4h 30m", url: "https://youtu.be/tww-gbNPOcA?si=m6VdIkvLSoKR_Dfa" },
+    { id: "db4", title: "Postgres DB", type: "video", duration: "4h 20m", url: "https://youtu.be/qw--VYLpxG4?si=ECqM56LP60F3owgD" },
+    { id: "db5", title: "Prisma", type: "video", duration: "1h", url: "https://youtu.be/RebA5J-rlwg?si=VF1wGTvKr8OuK-C2" },
   ],
 
   9: [ // React
-    { id: "r1", title: "Components", type: "video", duration: "9m", url: "https://youtube.com" },
-    { id: "r2", title: "Rendering", type: "video", duration: "6m", url: "https://youtube.com" },
-    { id: "r3", title: "Props", type: "video", duration: "5m", url: "https://youtube.com" },
-    { id: "r4", title: "Hooks", type: "video", duration: "10m", url: "https://youtube.com" },
-    { id: "r5", title: "Routers", type: "video", duration: "7m", url: "https://youtube.com" },
+    { id: "r1", title: "Components", type: "video", duration: "23m", url: "https://youtu.be/VSSm2nebwak?si=oHNv8P6KAk8IXAu1" },
+    { id: "r2", title: "Rendering", type: "video", duration: "3m", url: "https://youtu.be/mECV6nGOqNo?si=cpcXALGVDc1N3teY" },
+    { id: "r3", title: "Props", type: "video", duration: "20m", url: "https://youtu.be/VpGFuThTjhY?si=GydBO4UZEW1_J6Hp" },
+    { id: "r4", title: "Hooks", type: "video", duration: "45m", url: "https://youtu.be/4Cf86qVEIJY?si=b6v9nKwo0O2bUcUJ" },
+    { id: "r5", title: "Routers", type: "video", duration: "1h 5m", url: "https://youtu.be/VJov5QWEKE4?si=6sgiz74KKD7wlb9v" },
   ],
   10: [
-    { id: "r6", title: "State management (Redux)", type: "video", duration: "8m", url: "https://youtube.com" },
-    { id: "r7", title: "API Calls", type: "video", duration: "6m", url: "https://youtube.com" },
-    { id: "r8", title: "Framework (Next.js)", type: "video", duration: "9m", url: "https://youtube.com" },
-    { id: "r9", title: "Type & validation (Zod)", type: "video", duration: "5m", url: "https://youtube.com" },
-    { id: "r10", title: "Animation (Framer)", type: "video", duration: "7m", url: "https://youtube.com" },
+    { id: "r6", title: "State management (Redux)", type: "video", duration: "28m", url: "https://youtu.be/fxT54eRIsc4?si=EmSsJqWdT7Z0T-mk" },
+    { id: "r7", title: "API Calls", type: "video", duration: "15m", url: "https://youtu.be/V2x2Nq-fcTU?si=a8-SfkgmD4F8JfQc" },
+    { id: "r8", title: "Framework (Next.js)", type: "video", duration: "3h 30m", url: "https://youtu.be/wm5gMKuwSYk?si=CkQYvQgF-lDjMm2I" },
+    { id: "r9", title: "Type & validation (Zod)", type: "video", duration: "7m", url: "https://youtu.be/9UVPk0Ulm6U?si=LKajxhS6QlmuUZwn" },
+    { id: "r10", title: "Animation (Framer)", type: "video", duration: "25m", url: "https://youtu.be/GOuwOI-WSkE?si=d-NREBH7CapXyqu9" },
   ]
 
 } as const
