@@ -10,11 +10,12 @@ import { motion } from "framer-motion"
 import { Separator } from "@/components/ui/separator"
 import { countUnlockedProjects } from "@/utils/projectUtils"
 import { projects } from "@/data/projectData"
-import { badges, Badge as BadgeType } from "@/data/badgesData"
+import { Badge as BadgeType } from "@/data/badgesData"
 import { fetchUserEarnedBadges } from "@/services/badgeServices"
 import { CircularProgress } from "@/components/ui/CircleProgress"
 import { LessonProgressCard } from "@/components/ui/LessonProgressCard"
 import DailyQuestsCard from "@/components/ui/DailyQuestCard"
+import { BadgeCard } from "@/components/ui/badgesCard"
 
 type Profile = {
   id: string
@@ -51,34 +52,26 @@ export default function Dashboard() {
 
       const { data: completedLessons } = await supabase
         .from("lesson_progress")
-        .select("id, topic_srn, subtopic_id")
+        .select("id")
         .eq("user_id", user.id)
         .eq("is_completed", true)
 
       if (completedLessons) setLessonsCompleted(completedLessons.length)
 
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
         .single()
 
-      if (profileError || !profile) {
-        setUser({
-          id: user.id,
-          name: user.user_metadata?.name ?? null,
-          email: user.email ?? null,
-          avatar_url: user.user_metadata?.avatar_url ?? null,
-          created_at: null,
-          last_login: user.last_sign_in_at ?? null,
-        })
-      } else {
-        setUser({
-          ...profile,
-          email: user.email ?? profile.email,
-          last_login: user.last_sign_in_at ?? null,
-        })
-      }
+      setUser({
+        id: user.id,
+        name: profile?.name ?? user.user_metadata?.name ?? null,
+        email: user.email ?? profile?.email ?? null,
+        avatar_url: profile?.avatar_url ?? user.user_metadata?.avatar_url ?? null,
+        created_at: profile?.created_at ?? null,
+        last_login: user.last_sign_in_at ?? null,
+      })
     } catch (err) {
       console.error("Error loading dashboard:", err)
     } finally {
@@ -153,63 +146,80 @@ export default function Dashboard() {
               <Skeleton className="col-span-2 rounded-2xl bg-slate-800/50 h-full" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Profile Card */}
-              <div className="h-full">
-                <Card className="bg-black/10 backdrop-blur-md text-gray-50 rounded-2xl p-6 border border-white/20 shadow-lg font-mono h-full flex flex-col">
-                  <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-lg font-semibold">Profile</h1>
-                    <RefreshCw
-                      onClick={loadDashboard}
-                      className={`h-5 w-5 text-gray-400 hover:text-teal-400 transition-colors cursor-pointer ${
-                        isRefreshing ? "animate-spin text-teal-400" : ""
-                      }`}
-                    />
-                  </div>
-
-                  <div className="flex flex-col items-center mb-4">
-                    <div className="relative w-24 h-24">
-                      <CircularProgress progress={lessonsCompleted ? (lessonsCompleted / 49) * 100 : 0} />
-                      <img
-                        src={user?.avatar_url ?? "https://placehold.co/96x96/1e293b/d1d5db?text=User"}
-                        alt="User Profile"
-                        className="w-24 h-24 rounded-full object-cover p-1 absolute inset-0 m-auto border border-white/20"
+            <>
+              {/* 3-column grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Profile Card */}
+                <div className="h-full">
+                  <Card className="bg-black/10 backdrop-blur-md text-gray-50 rounded-2xl p-6 border border-white/20 shadow-lg font-mono h-full flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <h1 className="text-2xl font-semibold">Profile</h1>
+                      <RefreshCw
+                        onClick={loadDashboard}
+                        className={`h-5 w-5 text-gray-400 hover:text-teal-400 transition-colors cursor-pointer ${
+                          isRefreshing ? "animate-spin text-teal-400" : ""
+                        }`}
                       />
-                      <div className="absolute bottom-2 right-2 p-1.5 bg-teal-600 rounded-full shadow-md">
-                        <Star className="h-3.5 w-3.5 text-white" />
+                    </div>
+
+                    <div className="flex flex-col items-center mb-4">
+                      <div className="relative w-24 h-24">
+                        <CircularProgress progress={lessonsCompleted ? (lessonsCompleted / 49) * 100 : 0} />
+                        <img
+                          src={user?.avatar_url ?? "https://placehold.co/96x96/1e293b/d1d5db?text=User"}
+                          alt="User Profile"
+                          className="w-24 h-24 rounded-full object-cover p-1 absolute inset-0 m-auto border border-white/20"
+                        />
+                        <div className="absolute bottom-2 right-2 p-1.5 bg-teal-600 rounded-full shadow-md">
+                          <Star className="h-3.5 w-3.5 text-white" />
+                        </div>
+                      </div>
+                      <h2 className="mt-3 text-lg font-bold">{user?.name ?? "Learner"}</h2>
+                      <p className="text-gray-400 text-sm">{user?.email ?? "—"}</p>
+                    </div>
+
+                    <div className="flex justify-around text-center mt-0">
+                      <div>
+                        <CheckCircle className="mx-auto h-5 w-5 text-teal-400" />
+                        <p className="text-sm mt-1">{lessonsCompleted} Lessons</p>
+                      </div>
+                      <div>
+                        <Award className="mx-auto h-5 w-5 text-teal-400" />
+                        <p className="text-sm mt-1">{earnedCount} Badges</p>
+                      </div>
+                      <div>
+                        <LockKeyholeOpen className="mx-auto h-5 w-5 text-teal-400" />
+                        <p className="text-sm mt-1">{unlockedProjects} Projects</p>
                       </div>
                     </div>
-                    <h2 className="mt-3 text-lg font-bold">{user?.name ?? "Learner"}</h2>
-                    <p className="text-gray-400 text-sm">{user?.email ?? "—"}</p>
-                  </div>
+                  </Card>
+                </div>
 
-                  <div className="flex justify-around text-center mt-auto">
-                    <div>
-                      <CheckCircle className="mx-auto h-5 w-5 text-teal-400" />
-                      <p className="text-sm mt-1">{lessonsCompleted} Lessons</p>
-                    </div>
-                    <div>
-                      <Award className="mx-auto h-5 w-5 text-teal-400" />
-                      <p className="text-sm mt-1">{earnedCount} Badges</p>
-                    </div>
-                    <div>
-                      <LockKeyholeOpen className="mx-auto h-5 w-5 text-teal-400" />
-                      <p className="text-sm mt-1">{unlockedProjects} Projects</p>
-                    </div>
-                  </div>
-                </Card>
+                {/* Lesson Progress */}
+                <div className="h-full">
+                  <LessonProgressCard className="h-full" />
+                </div>
+
+                {/* Daily Quests */}
+                <div className="h-full">
+                  <DailyQuestsCard className="h-full" />
+                </div>
               </div>
 
-              {/* Lesson Progress */}
-              <div className="h-full">
-                <LessonProgressCard className="h-full" />
-              </div>
-
-              {/* Daily Quests */}
-              <div className="h-full">
-                <DailyQuestsCard className="h-full" />
-              </div>
-            </div>
+              {/* Full-width BadgeCard */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mt-8"
+              >
+                {isLoading ? (
+                  <Skeleton className="w-full h-36 rounded-2xl bg-slate-800/50" />
+                ) : (
+                  <BadgeCard  />
+                )}
+              </motion.div>
+            </>
           )}
         </main>
       </div>

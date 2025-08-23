@@ -105,7 +105,7 @@ export default function HeroSection() {
                         size="lg"
                         className="rounded-xl px-5 mb-6 text-sm bg-white text-zinc-950 font-bold hover:bg-white hover:text-zinc-950"
                       >
-                        <Link href="/courses">
+                        <Link href="/roadmap">
                           <span className="text-nowrap">Start learning today!</span>
                         </Link>
                       </Button>

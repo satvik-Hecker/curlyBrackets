@@ -78,3 +78,4 @@ export default function DailyQuestsCard({ className }: { className?: string }) {
     </Card>
   )
 }
+ 
