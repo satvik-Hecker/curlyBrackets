@@ -13,7 +13,7 @@ export const badges: Badge[] = [
     name: "Code Crawler",
     description: "Completed HTML Fundamentals like a true web spelunker.",
     image: "1.png",
-    topics: ["h1","h2","h3","h4","h5"]
+    topics: ["h1","h2","h3","h4","h5","h6"]
   },
   {
     id: "stylord",
@@ -34,7 +34,7 @@ image: "3.png",
     name: "Null Ninja",
     description: "Sliced through JavaScript Essentials with stealthy precision.",
     image: "4.png",
-    topics: ["js1","js2","js3"]
+    topics: ["js1","js2","js3","js4"]
   },
   {
     id: "last-tailwinder",
