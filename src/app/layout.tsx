@@ -14,9 +14,6 @@ import type { User } from '@supabase/supabase-js'
 
 
 
-
-
-
 const castoro = Castoro({
   weight: '400', 
   subsets: ['latin'],
@@ -72,6 +69,7 @@ export default function RootLayout({
 }, [])
   return (
     <html lang="en" className={`${geistMono.variable} ${castoro.variable}`}>
+      
       <body className='bg-black'>
       
         {!loading && (user ? <PostLoginNavbar/> : <Navbar/>)}

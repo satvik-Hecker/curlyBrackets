@@ -3,6 +3,7 @@ import { Castoro } from "next/font/google";
 import HeroSection from "@/components/landing/HeroSection";
 import FeaturesSection from "@/components/landing/Features";
 import { Faq } from "@/components/landing/Faq";
+import Head from "next/head";
 
 const castoro = Castoro({
   weight: '400', 
@@ -12,6 +13,7 @@ const castoro = Castoro({
 
 export default function Home() {
   return (
+    
     <div className="min-h-screen w-full relative bg-black">
         {/* Indigo Cosmos Background with Top Glow */}
         <div
@@ -25,5 +27,6 @@ export default function Home() {
         <FeaturesSection></FeaturesSection>
         <Faq/>
         </div>
+        
   );
 }
